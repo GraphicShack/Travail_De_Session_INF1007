@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+    <body onload="chargerDashboard()">
+        <nav class="navbar">
+            <div class="nav-logo">
+                Simulateur Décodeurs
+            </div>
+            <div class="nav-links">
+            <a href="/index.html">Accueil</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="decodeurs.html">Décodeurs</a>
+            <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+        <div class="container">
+            <h1>Dashboard</h1>
+            <p>Bienvenue <span id="nomUtilisateur"></span></p>
+            <nav>
+                <button onclick="window.location.href='decodeurs.html'">
+                Mes décodeurs
+                </button>
+                <button onclick="logout()">
+                Déconnexion
+                </button>
+            </nav>
+        </div>
+        <script type="module" src="../js/app.js"></script>
+    </body>
+    <footer>
+        <p>&copy; 2026 INF1007 - Projet de session</p>
+    </footer>
+</html>

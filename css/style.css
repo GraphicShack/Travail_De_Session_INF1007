@@ -1,0 +1,165 @@
+/* Reset simple */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* Style global */
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color:#f5f5f5;
+    color:#333;
+}
+
+/* Container général */
+
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:40px;
+}
+
+/* Formulaires */
+
+.form-container{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    width:300px;
+    margin:auto;
+}
+
+/* Inputs */
+
+input{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    font-size:14px;
+}
+
+/* Boutons */
+
+button{
+    padding:10px;
+    border:none;
+    background-color:#007bff;
+    color:white;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+button:hover{
+    background-color:#0056b3;
+}
+
+/* Navigation */
+
+nav{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+/* Cartes de décodeur */
+
+.decodeur{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:white;
+    padding:15px;
+    border-radius:6px;
+    margin-bottom:10px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Actions décodeur */
+
+.actions{
+    display:flex;
+    gap:8px;
+}
+
+/* Liens */
+
+a{
+    text-decoration:none;
+    color:#007bff;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+/* Titres */
+
+h1{
+    margin-bottom:20px;
+}
+
+h2{
+    margin-bottom:15px;
+}
+
+/* NAVBAR */
+
+.navbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background-color:#1e1e1e;
+    color:white;
+
+    padding:15px 30px;
+
+}
+
+.nav-logo{
+
+    font-weight:bold;
+    font-size:18px;
+
+}
+
+.nav-links{
+
+    display:flex;
+    gap:15px;
+
+}
+
+.nav-links a{
+
+    color:white;
+    text-decoration:none;
+    font-size:14px;
+
+}
+
+.nav-links a:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* FOOTER */
+
+.footer{
+
+    margin-top:40px;
+    padding:20px;
+
+    text-align:center;
+
+    background-color:#1e1e1e;
+    color:white;
+
+}

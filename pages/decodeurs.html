@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Décodeurs</title>
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="nav-logo">
+                Simulateur Décodeurs
+            </div>
+            <div class="nav-links">
+            <a href="/index.html">Accueil</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="decodeurs.html">Décodeurs</a>
+            <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+        <div class="container">
+        <h1>Gestion des décodeurs</h1>
+        <div class="decodeur">
+        <span>Voici un exemple : 127.0.10.1</span>
+        <div class="actions">
+            <button onclick="obtenirInfoDecodeur('127.0.10.1')">Info</button>
+            <button onclick="redemarrerDecodeur('127.0.10.1')">Redémarrer</button>
+            <button onclick="reinitDecodeur('127.0.10.1')">Réinitialiser</button>
+            <button onclick="shutdownDecodeur('127.0.10.1')">Éteindre</button>
+        </div>
+        </div>
+            <a href="dashboard.html">Retour</a>
+        </div>
+        <script type="module" src="../js/app.js"></script>
+    </body>
+    <footer>
+        <p>&copy; 2026 INF1007 - Projet de session</p>
+    </footer>
+</html>
