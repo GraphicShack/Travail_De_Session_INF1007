@@ -166,6 +166,34 @@ const BASE_URL = "http://localhost:3000/api/decoder";
     try {
       const res = await resetDecoder(id, address);
       msg(res);
+
+      // Après un reset, on attend que le décodeur redevienne "Active"
+      msg("Attente que le décodeur redevienne actif...");
+      const intervalMs = 5000; // 5 secondes
+      const timeoutMs = 60000; // 60 secondes max
+      const debut = Date.now();
+
+      while (true) {
+        if (Date.now() - debut > timeoutMs) {
+          msg("Timeout: le décodeur n'est pas redevenu actif dans le délai prévu.");
+          break;
+        }
+
+        await new Promise(r => setTimeout(r, intervalMs));
+
+        try {
+          const info = await getDecoderInfo(id, address);
+          msg(info);
+          majEtatDepuisInfo(info, address);
+
+          if (info.state && info.state.toLowerCase() === "active") {
+            msg("Le décodeur est maintenant actif.");
+            break;
+          }
+        } catch (err) {
+          msg("Erreur lors du polling info: " + err.message);
+        }
+      }
     } catch (e) {
       msg("Erreur reset: " + e.message);
     }
@@ -183,6 +211,15 @@ const BASE_URL = "http://localhost:3000/api/decoder";
     try {
       const res = await reinitDecoder(id, address);
       msg(res);
+
+      // Après reinit, on refait un appel info pour rafraîchir l'état
+      try {
+        const info = await getDecoderInfo(id, address);
+        msg(info);
+        majEtatDepuisInfo(info, address);
+      } catch (err) {
+        msg("Erreur info après reinit: " + err.message);
+      }
     } catch (e) {
       msg("Erreur reinit: " + e.message);
     }
@@ -200,6 +237,15 @@ const BASE_URL = "http://localhost:3000/api/decoder";
     try {
       const res = await shutdownDecoder(id, address);
       msg(res);
+
+      // Après extinction, on refait un appel info pour afficher le nouvel état
+      try {
+        const info = await getDecoderInfo(id, address);
+        msg(info);
+        majEtatDepuisInfo(info, address);
+      } catch (err) {
+        msg("Erreur info après extinction: " + err.message);
+      }
     } catch (e) {
       msg("Erreur shutdown: " + e.message);
     }
