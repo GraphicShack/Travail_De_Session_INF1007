@@ -15,6 +15,32 @@
       <section id="etat">
         <h2>État de votre décodeur</h2>
         <fieldset>
+          <legend>Sélection du décodeur</legend>
+          <p>
+            <label>Code permanent : <input id="input-code-permanent-top" type="text" placeholder="AAAA00000000"></label>
+          </p>
+          <p>
+            <label>Adresse :
+              <select id="select-adresse-decodeur">
+                <option>127.0.10.1</option>
+                <option>127.0.10.2</option>
+                <option>127.0.10.3</option>
+                <option>127.0.10.4</option>
+                <option>127.0.10.5</option>
+                <option>127.0.10.6</option>
+                <option>127.0.10.7</option>
+                <option>127.0.10.8</option>
+                <option>127.0.10.9</option>
+                <option>127.0.10.10</option>
+                <option>127.0.10.11</option>
+                <option>127.0.10.12</option>
+              </select>
+            </label>
+            <button id="btn-afficher-decodeur" type="button">Afficher</button>
+          </p>
+        </fieldset>
+
+        <fieldset>
           <legend>Informations du décodeur</legend>
           <div id="etat-content">
             <p><strong>Adresse :</strong> </p>
@@ -54,12 +80,18 @@
           </div>
         </fieldset>
 
+      <fieldset>
+        <legend>Messages</legend>
+        <div id="messages-content">
+        </div>
+      </fieldset>
+
     </main>
 
     <footer>
         <p>&copy; 2026 INF1007 - Projet de session</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../js/script.js"></script>
   </body>
 </html>
