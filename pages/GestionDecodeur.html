@@ -7,15 +7,29 @@
     <link rel="stylesheet" href="../css/style.css">
   </head>
   <body>
-    <header>
+    <nav class="navbar">
+            <div class="nav-logo">
+                Simulateur Décodeurs
+            </div>
+            <div class="nav-links">
+            <a href="/index.html">Accueil</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="decodeurs.html">Décodeurs</a>
+            <a href="admin.html">Admin</a>
+            </div>
+        </nav>
+        <header>
       <h1>Gestion du décodeur ( Felix )</h1>
     </header>
 
     <main>
-      <section id="etat">
-        <h2>État de votre décodeur</h2>
-        <fieldset>
-          <legend>Sélection du décodeur</legend>
+      <fieldset>
+        <legend>Gestion de votre décodeur</legend>
+
+        <section id="etat">
+          <h2>État de votre décodeur</h2>
+          <fieldset>
+            <legend>Sélection du décodeur</legend>
           <p>
             <label>Code permanent : <input id="input-code-permanent-top" type="text" placeholder="AAAA00000000"></label>
           </p>
@@ -38,52 +52,51 @@
             </label>
             <button id="btn-afficher-decodeur" type="button">Afficher</button>
           </p>
-        </fieldset>
+          </fieldset>
+
+          <fieldset>
+            <legend>Informations du décodeur</legend>
+            <div id="etat-content">
+              <p><strong>Adresse :</strong> </p>
+              <p><strong>Statut :</strong> </p>
+              <p><strong>Actif depuis :</strong> </p>
+              <p><strong>Réinitialisé :</strong> </p>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Actions rapides</legend>
+            <div id="actions-content">
+              <button type="button">Redémarrer</button>
+              <button type="button">Réinitialiser</button>
+              <button type="button">Éteindre</button>
+            </div>
+          </fieldset>
+        </section>
+
+        <section id="Chaines">
+           <h2>Chaînes</h2>
+           <fieldset>
+             <legend>Liste des chaines</legend>
+             <div id="chaines-content">
+
+               <ul>
+               </ul>
+             </div>
+           </fieldset>
+           <fieldset>
+            <legend>Actions rapides</legend>
+            <div id="actions-content">
+              <button type="button">Ajouter une Chaine</button>
+              <button type="button">Supprimer une Chaine</button>
+            </div>
+          </fieldset>
 
         <fieldset>
-          <legend>Informations du décodeur</legend>
-          <div id="etat-content">
-            <p><strong>Adresse :</strong> </p>
-            <p><strong>Statut :</strong> </p>
-            <p><strong>Actif depuis :</strong> </p>
-            <p><strong>Réinitialisé :</strong> </p>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>Actions rapides</legend>
-          <div id="actions-content">
-            <button type="button">Redémarrer</button>
-            <button type="button">Réinitialiser</button>
-            <button type="button">Éteindre</button>
-          </div>
-        </fieldset>
-      </section>
-
-      <section id="Chaines">
-         <h2>Chaînes</h2>
-         <fieldset>
-           <legend>Liste des chaines</legend>
-           <div id="chaines-content">
- 
-             <ul>
-               <li>Chaine 1</li>
-               <li>Chaine 2</li>
-               <li>Chaine 3</li>
-             </ul>
-           </div>
-         </fieldset>
-         <fieldset>
-          <legend>Actions rapides</legend>
-          <div id="actions-content">
-            <button type="button">Ajouter une Chaine</button>
-            <button type="button">Supprimer une Chaine</button>
+          <legend>Messages</legend>
+          <div id="messages-content">
           </div>
         </fieldset>
 
-      <fieldset>
-        <legend>Messages</legend>
-        <div id="messages-content">
-        </div>
       </fieldset>
 
     </main>
