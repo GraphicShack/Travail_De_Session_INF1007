@@ -1,5 +1,5 @@
 (function () {
-  const BASE_URL = "https://wflageol-uqtr.net/decoder";
+const BASE_URL = "http://localhost:3000/api/decoder";
   const DECODER_ADDRESSES = Array.from({ length: 12 }, (_, i) => `127.0.10.${i + 1}`);
   const ACTIONS = ["info", "reset", "reinit", "shutdown"];
 
