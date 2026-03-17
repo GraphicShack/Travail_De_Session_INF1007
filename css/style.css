@@ -163,3 +163,25 @@ h2{
     color:white;
 
 }
+
+/* Styles pour les fieldset (encadrés) */
+fieldset{
+    border:1px solid #ddd;
+    padding:14px 16px 16px 16px;
+    margin-bottom:16px;
+    background:#fff;
+    border-radius:6px;
+}
+
+fieldset legend{
+    padding:2px 8px;
+    background:#fff;
+    font-weight:600;
+    border-radius:4px;
+}
+
+/* Zone messages */
+#messages-content p{
+    margin-bottom:8px;
+    color:#b00;
+}
