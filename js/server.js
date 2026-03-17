@@ -50,7 +50,7 @@ app.post("/api/decoder", async (req, res) => {
   }
 });
 
-// (OPTIONNEL) Route pour la page /list
+// Route pour la page /list
 app.get("/api/list/:id", async (req, res) => {
   try {
     const id = req.params.id;
