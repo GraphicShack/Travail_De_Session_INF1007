@@ -90,13 +90,26 @@ const BASE_URL = "http://localhost:3000/api/decoder";
 
   function msg(texte) {
     const cont = document.getElementById("messages-content");
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    const ts = `${year}-${month}-${day}/${hours}:${minutes}:${seconds}/`;
+
+    const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
+    const ligne = `${ts} ${contenu}`;
+
     if (!cont) {
-      console.log(texte);
+      console.log(ligne);
       return;
     }
 
     const p = document.createElement("p");
-    p.textContent = typeof texte === "string" ? texte : JSON.stringify(texte);
+    p.textContent = ligne;
     cont.appendChild(p);
   }
 
