@@ -444,10 +444,6 @@ async function displayClients() {
     if (!div) return;
     try {
         const clients = await getClients();
-        const messageEl = document.createElement("p");
-        messageEl.textContent = "Clients récupérés avec succès.";
-        messageEl.className = "success";
-        div.appendChild(messageEl);
     } catch (error) {
         console.error("Erreur lors de l'affichage des clients:", error);
     }
@@ -456,7 +452,7 @@ async function displayClients() {
 // Récupération de la liste des utilisateurs (pour la page admin)
 async function getClients() {
     try {
-        const res = await fetch("${API_URL}/clients", {
+        const res = await fetch(`${API_URL}/clients`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
