@@ -136,45 +136,120 @@ function lireCodeEtAdresseDepuisPage() {
 // bouton Afficher les infos du décodeur
 async function boutonAfficherClique() {
   const { id, address } = lireCodeEtAdresseDepuisPage();
-  if (!id || !address) return msg("Code permanent ou adresse manquant");
-  msg(`Demande d'information pour ${address} (id=${id})`);
-  try { const info = await getDecoderInfo(id, address); msg(info); majEtatDepuisInfo(info, address); }
-  catch (e) { msg("Erreur info: " + e.message); }
+  if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+  msg(`Demande d'information pour ${address} (id=${id})`, "info");
+  try {
+    const info = await getDecoderInfo(id, address);
+    msg(info, "success");
+    majEtatDepuisInfo(info, address);
+  } catch (e) {
+    msg("Erreur info: " + e.message, "error");
+  }
 }
 
 // Fonction générique pour les actions qui nécessitent du polling (reset, reinit, shutdown)
 async function boutonResetClique() {
   const { id, address } = lireCodeEtAdresseDepuisPage();
-  if (!id || !address) return msg("Code permanent ou adresse manquant");
-  msg(`Reset du décodeur ${address}`);
+  if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+  msg(`Reset du décodeur ${address}`, "warning");
   try {
-    const res = await resetDecoder(id, address); msg(res); msg("Attente que le décodeur redevienne actif...");
+    // Afficher les infos dans la page pendant le polling
+    try {      
+      const info = await getDecoderInfo(id, address);
+      msg(info, "success");
+      majEtatDepuisInfo(info, address);
+    } catch (err) {
+      msg("Erreur info initiale: " + err.message, "debug");
+    }
+    const res = await resetDecoder(id, address);
+    msg(res, "success");
+    msg("Attente que le décodeur redevienne actif...", "debug");
     const intervalMs = 5000, timeoutMs = 60000, debut = Date.now();
     while (true) {
-      if (Date.now() - debut > timeoutMs) { msg("Timeout: le décodeur n'est pas redevenu actif."); break; }
+      if (Date.now() - debut > timeoutMs) {
+        msg("Timeout: le décodeur n'est pas redevenu actif.", "error");
+        break;
+      }
       await new Promise(r => setTimeout(r, intervalMs));
-      try { const info = await getDecoderInfo(id, address); msg(info); majEtatDepuisInfo(info, address); if (info.state?.toLowerCase() === "active") { msg("Le décodeur est maintenant actif."); break; } }
-      catch (err) { msg("Erreur polling info: " + err.message); }
+      try {
+        // une premierère requête pour voir si le décodeur est déjà redevenu actif
+        const info = await getDecoderInfo(id, address);
+        if (info.state === "active") {
+          msg("Le décodeur est redevenu actif !", "success");
+          msg(info, "success");
+          majEtatDepuisInfo(info, address);
+          break;
+        }
+      } catch (err) {
+        msg("Erreur polling info: " + err.message, "debug");
+      }
     }
-  } catch (e) { msg("Erreur reset: " + e.message); }
+  } catch (e) {
+    msg("Erreur reset: " + e.message, "error");
+  }
 }
+
 
 // bouton Réinitialiser le décodeur
 async function boutonReinitClique() {
   const { id, address } = lireCodeEtAdresseDepuisPage();
-  if (!id || !address) return msg("Code permanent ou adresse manquant");
-  msg(`Réinitialisation du décodeur ${address}`);
-  try { const res = await reinitDecoder(id, address); msg(res); const info = await getDecoderInfo(id, address); msg(info); majEtatDepuisInfo(info, address); }
-  catch (e) { msg("Erreur reinit: " + e.message); }
+  if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+  msg(`Réinitialisation du décodeur ${address}`, "warning");
+  try {
+    const res = await reinitDecoder(id, address);
+    msg(res, "success");
+    const info = await getDecoderInfo(id, address);
+    msg(info, "success");
+    majEtatDepuisInfo(info, address);
+  } catch (e) {
+    msg("Erreur reinit: " + e.message, "error");
+  }
 }
 
-// bouton Éteindre le décodeur
+
 async function boutonShutdownClique() {
   const { id, address } = lireCodeEtAdresseDepuisPage();
-  if (!id || !address) return msg("Code permanent ou adresse manquant");
-  msg(`Extinction du décodeur ${address}`);
-  try { const res = await shutdownDecoder(id, address); msg(res); const info = await getDecoderInfo(id, address); msg(info); majEtatDepuisInfo(info, address); }
-  catch (e) { msg("Erreur shutdown: " + e.message); }
+  if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+  msg(`Extinction du décodeur ${address}`, "warning");
+  try {
+    const res = await shutdownDecoder(id, address);
+    msg(res, "success");
+    const info = await getDecoderInfo(id, address);
+    msg(info, "success");
+    majEtatDepuisInfo(info, address);
+  } catch (e) {
+    msg("Erreur shutdown: " + e.message, "error");
+  }
+}
+// Fonction pour mettre les messages des logs des decodeurs en couleur
+function msg(texte, type = "info") {
+  const cont = document.getElementById("messages-content");
+  const now = new Date();
+  const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}/${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}/`;
+  const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
+
+  // Définir la couleur selon le type
+  let color;
+  switch(type) {
+    // Les types possibles sont : success, error, warning, debug, info
+    // Cas Vert : succès de l'action
+    case "success": color = "green"; break;
+    // Cas Rouge : erreur lors de l'action
+    case "error": color = "red"; break;
+    // Cas Orange : action en cours ou avertissement
+    case "warning": color = "orange"; break;
+    // Cas Bleu : messages de debug ou d'information détaillée
+    case "debug": color = "blue"; break;
+    // Cas Noir : messages d'information généraux ou autres
+    default: color = "black"; // info ou autres
+  }
+
+  const ligne = document.createElement("p");
+  ligne.textContent = `${ts} ${contenu}`;
+  ligne.style.color = color;
+
+  if (cont) cont.appendChild(ligne);
+  else console.log(`${ts} ${contenu}`);
 }
 
 // ==========================
