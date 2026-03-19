@@ -1,74 +1,191 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = 3000;
 
-// Autorise ton frontend (Live Server, localhost, etc.)
+// Middleware
 app.use(cors());
-
-// Permet de lire le JSON du body
 app.use(express.json());
 
-// Route principale pour parler au simulateur UQTR
+// Lecture des utilisateurs depuis le fichier JSON
+const USERS_PATH = path.resolve(__dirname, "..", "data", "users.json");
+
+function getUsers() {
+  const data = fs.readFileSync(USERS_PATH, "utf-8");
+  return JSON.parse(data);
+}
+
+// check-email
+app.get("/api/check-email", (req, res) => {
+  try {
+    const email = req.query.email;
+    if (!email) {
+      return res.status(400).json({
+        message: "Email requis"
+      });
+    }
+    const users = getUsers();
+    const exists = users.some(u => u.email === email);
+    res.json({ exists });
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur serveur"
+    });
+  }
+});
+
+
+// LOGIN
+app.post("/api/login", (req, res) => {
+  try {
+    const { email, motDePasse } = req.body;
+
+    if (!email || !motDePasse) {
+      return res.status(400).json({
+        message: "Email et mot de passe requis"
+      });
+    }
+
+    const users = getUsers();
+
+    const userData = users.find(
+      (u) => u.email === email && u.motDePasse === motDePasse
+    );
+
+    if (!userData) {
+      return res.status(401).json({
+        message: "Login invalide"
+      });
+    }
+
+    const user = {
+      id: userData.id,
+      nom: userData.nom,
+      email: userData.email,
+      role: userData.role
+    };
+
+    res.json({
+      message: "Connexion réussie",
+      user
+    });
+
+  } catch (error) {
+    console.error("Erreur login:", error);
+    res.status(500).json({
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// SIGNUP
+app.post("/api/signup", (req, res) => {
+  try {
+    const { nom, email, motDePasse } = req.body;
+
+    if (!nom || !email || !motDePasse) {
+      return res.status(400).json({
+        message: "Champs manquants"
+      });
+    }
+
+    const users = getUsers();
+
+    const existingUser = users.find(u => u.email === email);
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email déjà utilisé"
+      });
+    }
+
+    const newUser = {
+      id: users.length + 1,
+      nom,
+      email,
+      motDePasse,
+      role: "user"
+    };
+
+    users.push(newUser);
+
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+
+    res.json({
+      message: "Compte créé",
+      user: {
+        id: newUser.id,
+        nom: newUser.nom,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// GET USERS (TEST)
+app.get("/api/users", (req, res) => {
+  try {
+    const users = getUsers();
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// DECODEUR
 app.post("/api/decoder", async (req, res) => {
   try {
     const { id, address, action } = req.body;
 
-    // Validation simple
     if (!id || !address || !action) {
       return res.status(400).json({
-        response: "Error",
-        message: "Paramètres manquants (id, address, action)"
+        message: "Champs manquants"
       });
     }
 
-    // Appel vers l'API UQTR
-    const apiResponse = await fetch("https://wflageol-uqtr.net/decoder", {
+    // Appel vers API UQTR
+    const response = await fetch("https://wflageol-uqtr.net/decoder", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ id, address, action })
     });
 
-    const text = await apiResponse.text();
+    const data = await response.json();
 
-    // Renvoie la réponse telle quelle au frontend
-    res.status(apiResponse.status);
-    res.setHeader("Content-Type", "application/json");
-    res.send(text);
+    res.json(data);
 
   } catch (error) {
-    console.error("Erreur serveur:", error);
-
+    console.error("Erreur decodeur:", error);
     res.status(500).json({
-      response: "Error",
-      message: error.message
+      message: "Erreur serveur decodeur"
     });
   }
 });
 
-// Route pour la page /list
-app.get("/api/list/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
 
-    const response = await fetch(
-      `https://wflageol-uqtr.net/list?id=${encodeURIComponent(id)}`
-    );
-
-    const html = await response.text();
-
-    res.status(response.status).send(html);
-
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
+// 404 HANDLER
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route introuvable"
+  });
 });
 
-// Démarrage du serveur
+
+// Lancer le serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Backend lancé sur http://localhost:${PORT}`);
+  console.log(`Serveur lancé sur http://localhost:${PORT}`);
 });

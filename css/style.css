@@ -185,8 +185,123 @@ fieldset legend{
     border-radius:4px;
 }
 
-/* Zone messages */
-#messages-content p{
-    margin-bottom:8px;
-    color:#b00;
+/* LOGIN PAGE */
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.login-card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 320px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-card h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.login-card input {
+    width: 100%;
+}
+
+.login-card button {
+    width: 100%;
+}
+
+/* message */
+
+#login-message {
+    font-size: 14px;
+    text-align: center;
+    min-height: 20px;
+}
+
+.error {
+    color: #e53935;
+}
+
+.success {
+    color: #43a047;
+}
+
+#signup-message {
+    font-size: 14px;
+    text-align: center;
+    min-height: 20px;
+}
+
+.navbar {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between; /* logo à gauche, nav à droite */
+  align-items: center;
+  gap: 50px; /* espace entre le logo et la nav à droite */
+}
+
+.nav-logo a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-right: 50px; /* encore plus d'espace si nécessaire */
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* espace entre les liens et le bouton */
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+}
+
+#btn-logout {
+  padding: 5px 10px;
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#btn-logout:hover {
+  background-color: #ff1a1a;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff; /* couleur par défaut */
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s;
+}
+
+.nav-links a.active {
+    background-color: #696766; /* couleur du lien actif */
+    border-radius: 5px;
 }

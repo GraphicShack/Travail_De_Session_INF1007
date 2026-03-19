@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <title>Créer un compte</title>
-        <link rel="stylesheet" href="../css/style.css">
-    </head>
-    <body>
-        <nav class="navbar">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer un compte</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
             <div class="nav-logo">
-                Simulateur Décodeurs
+            <a href="dashboard.html">Simulateur Décodeurs</a>
             </div>
-            <div class="nav-links">
-            <a href="/index.html">Accueil</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="GestionDecodeur.html">Décodeurs</a>
-            <a href="admin.html">Admin</a>
-            </div>
-        </nav>
-        <div class="container">
+        </div>
+    </nav>
+    <div class="login-container">
+        <div class="login-card">
             <h1>Créer un compte</h1>
+
             <input id="nom" placeholder="Nom">
             <input id="email" placeholder="Email">
             <input id="motdepasse" type="password" placeholder="Mot de passe">
+            <input id="confirm-motdepasse" type="password" placeholder="Confirmer le mot de passe">
+
             <button onclick="signup()">Créer le compte</button>
-            <a href="signin.html">Retour connexion</a>
+
+            <div id="signup-message"></div>
+
+            <a href="signin.html">Déjà un compte ? Se connecter</a>
         </div>
-        <script type="module" src="../js/app.js"></script>
-    </body>
-    <footer>
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+<footer>
         <p>&copy; 2026 INF1007 - Projet de session</p>
     </footer>
 </html>

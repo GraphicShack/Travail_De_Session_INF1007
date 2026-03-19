@@ -8,16 +8,20 @@
   </head>
   <body>
     <nav class="navbar">
+        <div class="nav-container">
             <div class="nav-logo">
-                Simulateur Décodeurs
+                <a href="dashboard.html">Simulateur Décodeurs</a>
             </div>
-            <div class="nav-links">
-            <a href="/index.html">Accueil</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="GestionDecodeur.html">Décodeurs</a>
-            <a href="admin.html">Admin</a>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="GestionDecodeur.html">Décodeurs</a></li>
+                <li><a href="admin.html" id="nav-admin-link">Admin</a></li>
+            </ul>
+            <div class="nav-logout">
+                <button id="btn-logout">Déconnexion</button>
             </div>
-        </nav>
+        </div>
+    </nav>
         <header>
       <h1>Gestion du décodeur</h1>
     </header>
