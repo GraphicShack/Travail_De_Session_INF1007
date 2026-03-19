@@ -201,6 +201,17 @@ function validatePassword(pwd) {
     return /^(?=.*[A-Z]).{8,}$/.test(pwd);
 }
 
+function hachageMotDePasse(motDePasse) {
+    // Implémentation d'un hachage simple (à ne pas utiliser en production)
+    let hash = 0;
+    for (let i = 0; i < motDePasse.length; i++) {
+        const char = motDePasse.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash.toString();
+}
+
 // Fonction d'inscription
 async function signup() {
   // Récupération des valeurs des champs et validation
@@ -243,13 +254,15 @@ async function signup() {
         messageEl.textContent = "Les mots de passe ne correspondent pas";
         messageEl.className = "error";
         return;
-    }
+    } 
+    // Hachage du mot de passe avant l'envoi
+    const hashedPwd = hachageMotDePasse(motDePasse);
     // Envoi de la requête d'inscription au serveur
     try {
         const res = await fetch(`${API_URL}/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nom, email, motDePasse })
+            body: JSON.stringify({ nom, email, motDePasse: hashedPwd })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -282,13 +295,15 @@ async function signin() {
         messageEl.className = "error";
         return;
     }
+    // Hachage du mot de passe avant l'envoi (pour correspondre à ce qui est stocké côté serveur)
+    const hashedPwd = hachageMotDePasse(motDePasse);
 
     // Envoi de la requête de connexion au serveur
     try {
         const res = await fetch(`${API_URL}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, motDePasse })
+            body: JSON.stringify({ email, motDePasse: hashedPwd })
         });
         const data = await res.json();
         if (!res.ok) {
