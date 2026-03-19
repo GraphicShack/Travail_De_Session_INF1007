@@ -5,5 +5,12 @@
     "email": "paquette.alecc@gmail.com",
     "motDePasse": "-1083238412",
     "role": "admin"
+  },
+  {
+    "id": 2,
+    "nom": "Alec",
+    "email": "paquette.alecc2@gmail.com",
+    "motDePasse": "-1083238412",
+    "role": "user"
   }
 ]
