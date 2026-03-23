@@ -176,6 +176,25 @@ app.post("/api/decoder", async (req, res) => {
   }
 });
 
+// GET CLIENTS
+app.get("/api/clients", async (req, res) => {
+	try {
+		const users = getUsers();
+		const clients = users.filter(u => u.role === "user").map(u => ({
+			id: u.id,
+			nom: u.nom,
+			email: u.email,
+			decodeurs: u.decodeurs || []
+		}));
+
+		res.json(clients);
+	} catch (error) {
+		res.status(500).json({
+			message: "Erreur serveur"
+		});
+	}
+});
+
 
 // 404 HANDLER
 app.use((req, res) => {

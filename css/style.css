@@ -1,166 +1,158 @@
 /* Reset simple */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Style global */
 
-body{
+body {
     font-family: Arial, Helvetica, sans-serif;
-    background-color:#f5f5f5;
-    color:#333;
+    background-color: #f5f5f5;
+    color: #333;
 }
 
 /* Container général */
 
-.container{
-    max-width:800px;
-    margin:auto;
-    padding:40px;
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 40px;
 }
 
 /* Formulaires */
 
-.form-container{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    width:300px;
-    margin:auto;
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 300px;
+    margin: auto;
 }
 
 /* Inputs */
 
-input{
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:4px;
-    font-size:14px;
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 /* Boutons */
 
-button{
-    padding:10px;
-    border:none;
-    background-color:#007bff;
-    color:white;
-    border-radius:4px;
-    cursor:pointer;
-    font-size:14px;
+button {
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-button:hover{
-    background-color:#0056b3;
+button:hover {
+    background-color: #0056b3;
 }
 
 /* Navigation */
 
-nav{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
+nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 /* Cartes de décodeur */
 
-.decodeur{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:white;
-    padding:15px;
-    border-radius:6px;
-    margin-bottom:10px;
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+.decodeur {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Actions décodeur */
 
-.actions{
-    display:flex;
-    gap:8px;
+.actions {
+    display: flex;
+    gap: 8px;
 }
 
 /* Liens */
 
-a{
-    text-decoration:none;
-    color:#007bff;
+a {
+    text-decoration: none;
+    color: #007bff;
 }
 
-a:hover{
-    text-decoration:underline;
+a:hover {
+    text-decoration: underline;
 }
 
 /* Titres */
 
-h1{
-    margin-bottom:20px;
+h1 {
+    margin-bottom: 20px;
 }
 
-h2{
-    margin-bottom:15px;
+h2 {
+    margin-bottom: 15px;
+}
+
+/* Lignes horizontales */
+hr {
+    margin: 10px 0 20px 0;
 }
 
 /* NAVBAR */
 
-.navbar{
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    background-color: #1e1e1e;
+    color: white;
 
-    background-color:#1e1e1e;
-    color:white;
-
-    padding:15px 30px;
-
+    padding: 15px 30px;
 }
 
-.nav-logo{
-
-    font-weight:bold;
-    font-size:18px;
-
+.nav-logo {
+    font-weight: bold;
+    font-size: 18px;
 }
 
-.nav-links{
-
-    display:flex;
-    gap:15px;
-
+.nav-links {
+    display: flex;
+    gap: 15px;
 }
 
-.nav-links a{
-
-    color:white;
-    text-decoration:none;
-    font-size:14px;
-
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
 }
 
-.nav-links a:hover{
-
-    text-decoration:underline;
-
+.nav-links a:hover {
+    text-decoration: underline;
 }
-
 
 /* FOOTER */
 
-.footer{
+.footer {
+    margin-top: 40px;
+    padding: 20px;
 
-    margin-top:40px;
-    padding:20px;
-
-    text-align:center;
-    background-color:#1e1e1e;
-    color:white;
-
+    text-align: center;
+    background-color: #1e1e1e;
+    color: white;
 }
 
 /* Zone Messages: hauteur limitée avec scroll interne */
@@ -170,19 +162,19 @@ h2{
 }
 
 /* Styles pour les fieldset (encadrés) */
-fieldset{
-    border:1px solid #ddd;
-    padding:14px 16px 16px 16px;
-    margin-bottom:16px;
-    background:#fff;
-    border-radius:6px;
+fieldset {
+    border: 1px solid #ddd;
+    padding: 14px 16px 16px 16px;
+    margin-bottom: 16px;
+    background: #fff;
+    border-radius: 6px;
 }
 
-fieldset legend{
-    padding:2px 8px;
-    background:#fff;
-    font-weight:600;
-    border-radius:4px;
+fieldset legend {
+    padding: 2px 8px;
+    background: #fff;
+    font-weight: 600;
+    border-radius: 4px;
 }
 
 /* LOGIN PAGE */
@@ -198,7 +190,7 @@ fieldset legend{
     background: white;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     width: 320px;
 
     display: flex;
@@ -242,56 +234,56 @@ fieldset legend{
 }
 
 .navbar {
-  background-color: #333;
-  color: white;
-  padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
 }
 
 .nav-container {
-  display: flex;
-  justify-content: space-between; /* logo à gauche, nav à droite */
-  align-items: center;
-  gap: 50px; /* espace entre le logo et la nav à droite */
+    display: flex;
+    justify-content: space-between; /* logo à gauche, nav à droite */
+    align-items: center;
+    gap: 50px; /* espace entre le logo et la nav à droite */
 }
 
 .nav-logo a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2em;
-  font-weight: bold;
-  margin-right: 50px; /* encore plus d'espace si nécessaire */
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-right: 50px; /* encore plus d'espace si nécessaire */
 }
 
 .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 20px; /* espace entre les liens et le bouton */
+    display: flex;
+    align-items: center;
+    gap: 20px; /* espace entre les liens et le bouton */
 }
 
 .nav-links {
-  display: flex;
-  list-style: none;
-  gap: 15px;
-  margin: 0;
-  padding: 0;
+    display: flex;
+    list-style: none;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-links li a {
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 #btn-logout {
-  padding: 5px 10px;
-  background-color: #ff4d4d;
-  border: none;
-  color: white;
-  cursor: pointer;
-  border-radius: 4px;
+    padding: 5px 10px;
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
 #btn-logout:hover {
-  background-color: #ff1a1a;
+    background-color: #ff1a1a;
 }
 
 .nav-links a {
