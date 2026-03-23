@@ -51,21 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================
-// Fonctions de log
-// ==========================
-function msg(texte) {
-    const cont = document.getElementById("messages-content");
-    const now = new Date();
-    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}/${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}/`;
-    const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
-    const ligne = `${ts} ${contenu}`;
-    if (!cont) return console.log(ligne);
-    const p = document.createElement("p");
-    p.textContent = ligne;
-    cont.appendChild(p);
-}
-
-// ==========================
 // API Decodeur
 // ==========================
 
@@ -444,6 +429,10 @@ async function displayClients() {
     if (!div) return;
     try {
         const clients = await getClients();
+				for (const client of clients) {
+					div.append(createClientLine(client));
+					div.append(document.createElement("hr"));
+				}
     } catch (error) {
         console.error("Erreur lors de l'affichage des clients:", error);
     }
@@ -457,12 +446,18 @@ async function getClients() {
             headers: { "Content-Type": "application/json" },
         });
         const data = await res.json();
-        console.log("Clients récupérés:", data);
-        return data.clients || null;
+        return data || null;
     } catch (error) {
         console.error("Erreur lors de la récupération des clients:", error);
         return null;
     }
+}
+
+//Affichage des données d'un client 
+function createClientLine(client) {
+	const line = document.createElement("div");
+	line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div>`;
+	return line;
 }
 
 // ==========================
