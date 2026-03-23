@@ -426,6 +426,7 @@ async function signin() {
 // Affichage des clients
 async function displayClients() {
     const div = document.getElementById("listeUtilisateurs");
+    const messageEl = document.getElementById("admin-message");
     if (!div) return;
     try {
         const clients = await getClients();
@@ -435,6 +436,8 @@ async function displayClients() {
         }
     } catch (error) {
         console.error("Erreur lors de l'affichage des clients:", error);
+        messageEl.textContent = "Erreur serveur";
+        messageEl.className = "error";
     }
 }
 
@@ -457,13 +460,43 @@ async function getClients() {
 function createClientLine(client) {
     const line = document.createElement("div");
     line.className = "client-line";
-    line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div><button onclick="editClient(${client.id})">Modifier</button><button onclick="deleteClient(${client.id})">Supprimer</button>`;
+
+		const buttonEdit = document.createElement("button");
+		buttonEdit.textContent = "Modifier";
+		buttonEdit.onclick = () => editClient(client.id);
+
+		const buttonDelete = document.createElement("button");
+    buttonDelete.textContent = "Supprimer";
+    buttonDelete.onclick = () => deleteClient(client.id);
+
+    line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div>`;
+    line.appendChild(buttonEdit);
+    line.appendChild(buttonDelete);
     return line;
 }
 
 //Suppresion d'un client
 async function deleteClient(id) {
-	
+    try {
+        const messageEl = document.getElementById("admin-message");
+				const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce client ?");
+				if (!confirmation) return;
+				const res = await fetch(`${API_URL}/clients/${id}`, {
+						method: "DELETE",
+						headers: { "Content-Type": "application/json" },
+				});
+				const data = await res.json();
+        if (!res.ok) {
+            messageEl.textContent = data.message || "Erreur serveur";
+            messageEl.className = "error";
+            return;
+        }
+				messageEl.textContent = "Client supprimé avec succès";
+        messageEl.className = "success";
+    } catch (error) {
+        messageEl.textContent = "Erreur serveur";
+        messageEl.className = "error";
+    }
 }
 
 //Modification d'un client
