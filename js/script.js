@@ -429,10 +429,10 @@ async function displayClients() {
     if (!div) return;
     try {
         const clients = await getClients();
-				for (const client of clients) {
-					div.append(createClientLine(client));
-					div.append(document.createElement("hr"));
-				}
+        for (const client of clients) {
+            div.append(createClientLine(client));
+            div.append(document.createElement("hr"));
+        }
     } catch (error) {
         console.error("Erreur lors de l'affichage des clients:", error);
     }
@@ -453,12 +453,21 @@ async function getClients() {
     }
 }
 
-//Affichage des données d'un client 
+//Affichage des données d'un client
 function createClientLine(client) {
-	const line = document.createElement("div");
-	line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div>`;
-	return line;
+    const line = document.createElement("div");
+    line.className = "client-line";
+    line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div><button onclick="editClient(${client.id})">Modifier</button><button onclick="deleteClient(${client.id})">Supprimer</button>`;
+    return line;
 }
+
+//Suppresion d'un client
+async function deleteClient(id) {
+	
+}
+
+//Modification d'un client
+async function editClient(id) {}
 
 // ==========================
 // Dashboard / UI
