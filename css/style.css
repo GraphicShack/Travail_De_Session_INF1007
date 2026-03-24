@@ -78,11 +78,93 @@ nav {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Cartes de décodeurs sur le dashboard */
+
+.decoders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.decoders-header {
+    display: flex;
+    justify-content: space-between; /* bouton à gauche, texte à droite */
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.last-update-text {
+    font-size: 12px;
+    color: #666;
+}
+
+.decoder-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.decoder-card:hover {
+    background-color: #f7f9fc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
 /* Actions décodeur */
 
 .actions {
     display: flex;
     gap: 8px;
+}
+
+/* Boutons dans les cartes décodeurs du dashboard (supprimés pour le dashboard) */
+.decoder-actions {
+    display: none;
+}
+
+.decoder-card-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.decoder-status-bar {
+    width: 6px;
+    border-radius: 4px;
+}
+
+.status-active {
+    background-color: #43a047; /* vert pour actif */
+}
+
+.status-inactive {
+    background-color: #b0bec5; /* gris/bleu pâle pour inactif */
+}
+
+.decoder-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.decoder-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Bouton d'extinction en rouge */
+
+.btn-shutdown {
+    background-color: #e53935;
+}
+
+.btn-shutdown:hover {
+    background-color: #c62828;
 }
 
 /* Liens */
@@ -104,6 +186,12 @@ h1 {
 
 h2 {
     margin-bottom: 15px;
+}
+
+/* Espacement entre la zone d'accueil et la liste des décodeurs sur le dashboard */
+
+#user-info {
+    margin-bottom: 24px;
 }
 
 /* Lignes horizontales */
@@ -147,12 +235,15 @@ hr {
 /* FOOTER */
 
 .footer {
-    margin-top: 40px;
-    padding: 20px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
 
     text-align: center;
-    background-color: #1e1e1e;
+    background-color: #1e1e1e; /* même couleur que la navbar */
     color: white;
+    padding: 10px 0;
 }
 
 /* Zone Messages: hauteur limitée avec scroll interne */
