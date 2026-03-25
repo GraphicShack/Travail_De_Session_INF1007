@@ -761,12 +761,89 @@ function initialiserUI() {
     const actions = document.querySelector("#etat #actions-content");
     const [btnReset, btnReinit, btnShutdown] = actions?.querySelectorAll("button") || [];
 
+    // Sélection par utilisateur (page GestionDecodeur)
+    const selectUserAdmin = document.getElementById("select-user-admin");
+    const selectUserDecoder = document.getElementById("select-user-decoder");
+    const btnChargerDepuisUser = document.getElementById("btn-charger-depuis-user");
+
     // Ajout des écouteurs d'événements pour les boutons
     if (btnAfficher) btnAfficher.addEventListener("click", boutonAfficherClique);
     if (btnRefreshDecoders) btnRefreshDecoders.addEventListener("click", displayUserDecoders);
     if (btnReset) btnReset.addEventListener("click", boutonResetClique);
     if (btnReinit) btnReinit.addEventListener("click", boutonReinitClique);
     if (btnShutdown) btnShutdown.addEventListener("click", boutonShutdownClique);
+
+    // Initialisation de la sélection par utilisateur (admin)
+    if (selectUserAdmin && selectUserDecoder) {
+        initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDecoder);
+    }
+    if (btnChargerDepuisUser) {
+        btnChargerDepuisUser.addEventListener("click", chargerDecodeurDepuisSelectionUser);
+    }
+}
+
+// Remplir la liste des utilisateurs et de leurs décodeurs pour la page admin
+async function initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDecoder) {
+    try {
+        const res = await fetch(`${API_URL}/users`);
+        const users = await res.json();
+
+        // Stocker les utilisateurs pour réutilisation lors du changement de sélection
+        window.__adminUsers = users;
+
+        // Remplir la liste des utilisateurs
+        users.forEach((u, index) => {
+            const opt = document.createElement("option");
+            opt.value = String(index); // on stocke l'index dans le tableau
+            opt.textContent = `${u.nom} — ${u.email}`;
+            selectUserAdmin.appendChild(opt);
+        });
+
+        // Quand on change d'utilisateur, on remplit sa liste de décodeurs
+        selectUserAdmin.addEventListener("change", () => {
+            const idx = selectUserAdmin.value;
+            selectUserDecoder.innerHTML = '<option value="">-- choisir un décodeur --</option>';
+            if (!idx) return;
+            const user = window.__adminUsers?.[Number(idx)];
+            const decoders = user?.decodeurs || [];
+            decoders.forEach((addr) => {
+                const opt = document.createElement("option");
+                opt.value = addr;
+                opt.textContent = addr;
+                selectUserDecoder.appendChild(opt);
+            });
+        });
+    } catch (e) {
+        console.error("Erreur lors de l'initialisation de la sélection utilisateur (admin):", e);
+    }
+}
+
+// Quand on clique sur "Charger", on copie le code permanent + adresse dans les champs existants
+// puis on réutilise la logique du bouton Afficher
+function chargerDecodeurDepuisSelectionUser() {
+    const selectUserAdmin = document.getElementById("select-user-admin");
+    const selectUserDecoder = document.getElementById("select-user-decoder");
+    const idx = selectUserAdmin?.value;
+    const address = selectUserDecoder?.value;
+    if (!idx || !address) {
+        msg("Sélectionnez un utilisateur et un décodeur", "error");
+        return;
+    }
+
+    const user = window.__adminUsers?.[Number(idx)];
+    const codePermanent = user?.codePermanent;
+    if (!codePermanent) {
+        msg("Code permanent introuvable pour cet utilisateur", "error");
+        return;
+    }
+
+    const idInput = document.getElementById("input-code-permanent-top");
+    const selectAdresse = document.getElementById("select-adresse-decodeur");
+    if (idInput) idInput.value = codePermanent;
+    if (selectAdresse) selectAdresse.value = address;
+
+    // Réutiliser la logique existante
+    boutonAfficherClique();
 }
 
 // Initialisation au chargement de la page

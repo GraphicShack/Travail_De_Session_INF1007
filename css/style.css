@@ -87,6 +87,17 @@ nav {
     margin-top: 20px;
 }
 
+.decoders-section-header {
+    margin-top: 16px;
+}
+
+.decoders-section-bar {
+    height: 3px;
+    background-color: #d0d4dc; /* gris pâle plus discret */
+    border-radius: 2px;
+    margin: 8px 0 8px 0;
+}
+
 .decoders-header {
     display: flex;
     justify-content: space-between; /* bouton à gauche, texte à droite */
