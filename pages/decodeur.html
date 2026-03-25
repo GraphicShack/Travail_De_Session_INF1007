@@ -58,15 +58,15 @@
           <h2>Chaînes</h2>
           <fieldset>
             <legend>Liste des chaines</legend>
-            <div id="chaines-content">
-              <ul>
-              </ul>
+            <div id="chaines-content" class="chaines-container">
+              <div id="chaines-list" class="chaines-grid"></div>
             </div>
             <fieldset>
               <legend>Actions rapides</legend>
               <div id="chaines-actions-content">
-                <button type="button">Ajouter une Chaine</button>
-                <button type="button">Supprimer une Chaine</button>
+                <input id="input-nouvelle-chaine" type="text" placeholder="Nom de la chaîne">
+                <button id="btn-ajouter-chaine" type="button">Ajouter une Chaine</button>
+                <button id="btn-supprimer-chaine" type="button" disabled>Supprimer</button>
               </div>
             </fieldset>
           </fieldset>
@@ -86,6 +86,7 @@
         <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
 
+  <script src="../js/decoder.js"></script>
   <script src="../js/script.js"></script>
   <script>
     // Préremplissage et affichage automatique depuis les paramètres d'URL
@@ -108,6 +109,31 @@
         } catch (e) {
           console.error('Erreur lors du chargement du décodeur:', e);
         }
+      }
+
+      // Charger la liste des chaînes pour ce décodeur dès l'ouverture
+      if (codePermanent && address && typeof rafraichirAffichageChaines === 'function') {
+        rafraichirAffichageChaines(codePermanent, address);
+      }
+
+      // Gestion des chaînes via le champ texte + bouton Ajouter
+      const btnAdd = document.getElementById('btn-ajouter-chaine');
+      const btnRemove = document.getElementById('btn-supprimer-chaine');
+      const inputChaine = document.getElementById('input-nouvelle-chaine');
+
+      if (btnAdd && inputChaine && window.DecodeurUI?.ajouterChainePourDecodeur) {
+        btnAdd.addEventListener('click', () => {
+          const nom = inputChaine.value.trim();
+          if (!nom) return;
+          window.DecodeurUI.ajouterChainePourDecodeur(nom);
+          inputChaine.value = "";
+        });
+      }
+
+      if (btnRemove && window.DecodeurUI?.supprimerChaineSelectionnee) {
+        btnRemove.addEventListener('click', () => {
+          window.DecodeurUI.supprimerChaineSelectionnee();
+        });
       }
     });
   </script>

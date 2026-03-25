@@ -12,10 +12,32 @@ app.use(express.json());
 
 // Lecture des utilisateurs depuis le fichier JSON
 const USERS_PATH = path.resolve(__dirname, "..", "data", "users.json");
+const CHAINES_PATH = path.resolve(__dirname, "..", "data", "chaines.json");
 
 function getUsers() {
   const data = fs.readFileSync(USERS_PATH, "utf-8");
   return JSON.parse(data);
+}
+
+function saveUsers(users) {
+  fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+}
+
+// Lecture / écriture des chaînes partagées
+function getChaines() {
+  try {
+    if (!fs.existsSync(CHAINES_PATH)) {
+      return {};
+    }
+    const data = fs.readFileSync(CHAINES_PATH, "utf-8");
+    return data ? JSON.parse(data) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveChaines(chaines) {
+  fs.writeFileSync(CHAINES_PATH, JSON.stringify(chaines, null, 2));
 }
 
 // check-email
@@ -95,9 +117,9 @@ app.post("/api/signup", (req, res) => {
       });
     }
 
-    const users = getUsers();
+  const users = getUsers();
 
-    const existingUser = users.find(u => u.email === email);
+  const existingUser = users.find(u => u.email === email);
 
     if (existingUser) {
       return res.status(400).json({
@@ -115,7 +137,7 @@ app.post("/api/signup", (req, res) => {
 
     users.push(newUser);
 
-    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+    saveUsers(users);
 
     res.json({
       message: "Compte créé",
@@ -144,6 +166,47 @@ app.get("/api/users", (req, res) => {
     res.status(500).json({
       message: "Erreur serveur"
     });
+  }
+});
+
+// =============================
+// API chaînes partagées
+// Structure: { "codePermanent": { "127.0.10.1": ["RDS", "TVA"] } }
+// =============================
+
+// Récupérer les chaînes pour un utilisateur et une adresse donnée
+app.get("/api/chaines", (req, res) => {
+  try {
+    const { id, address } = req.query;
+    if (!id || !address) {
+      return res.status(400).json({ message: "id et address requis" });
+    }
+    const all = getChaines();
+    const userChaines = all[id] && Array.isArray(all[id][address]) ? all[id][address] : [];
+    res.json({ chaines: userChaines });
+  } catch (error) {
+    console.error("Erreur /api/chaines (GET)", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// Mettre à jour les chaînes pour un utilisateur et une adresse donnée
+app.post("/api/chaines", (req, res) => {
+  try {
+    const { id, address, chaines } = req.body;
+    if (!id || !address || !Array.isArray(chaines)) {
+      return res.status(400).json({ message: "id, address et chaines requis" });
+    }
+    const all = getChaines();
+    if (!all[id] || typeof all[id] !== "object") {
+      all[id] = {};
+    }
+    all[id][address] = chaines;
+    saveChaines(all);
+    res.json({ message: "OK", chaines: all[id][address] });
+  } catch (error) {
+    console.error("Erreur /api/chaines (POST)", error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

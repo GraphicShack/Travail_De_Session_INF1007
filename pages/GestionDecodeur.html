@@ -100,22 +100,21 @@
         </section>
 
         <section id="Chaines">
-           <h2>Chaînes</h2>
-           <fieldset>
-             <legend>Liste des chaines</legend>
-             <div id="chaines-content">
-
-               <ul>
-               </ul>
-             </div>
-             <fieldset>
-            <legend>Actions rapides</legend>
-            <div id="actions-content">
-              <button type="button">Ajouter une Chaine</button>
-              <button type="button">Supprimer une Chaine</button>
+          <h2>Chaînes</h2>
+          <fieldset>
+            <legend>Liste des chaines</legend>
+            <div id="chaines-content" class="chaines-container">
+              <div id="chaines-list" class="chaines-grid"></div>
             </div>
+            <fieldset>
+              <legend>Actions rapides</legend>
+              <div id="chaines-actions-content">
+                <input id="input-nouvelle-chaine" type="text" placeholder="Nom de la chaîne">
+                <button id="btn-ajouter-chaine" type="button">Ajouter une Chaine</button>
+                <button id="btn-supprimer-chaine" type="button" disabled>Supprimer</button>
+              </div>
+            </fieldset>
           </fieldset>
-           </fieldset>
            
 
         <fieldset>
@@ -133,6 +132,29 @@
         <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
 
-    <script src="../js/script.js"></script>
+  <script src="../js/decoder.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnAdd = document.getElementById('btn-ajouter-chaine');
+      const btnRemove = document.getElementById('btn-supprimer-chaine');
+      const inputChaine = document.getElementById('input-nouvelle-chaine');
+
+      if (btnAdd && inputChaine && window.DecodeurUI?.ajouterChainePourDecodeur) {
+        btnAdd.addEventListener('click', () => {
+          const nom = inputChaine.value.trim();
+          if (!nom) return;
+          window.DecodeurUI.ajouterChainePourDecodeur(nom);
+          inputChaine.value = "";
+        });
+      }
+
+      if (btnRemove && window.DecodeurUI?.supprimerChaineSelectionnee) {
+        btnRemove.addEventListener('click', () => {
+          window.DecodeurUI.supprimerChaineSelectionnee();
+        });
+      }
+    });
+  </script>
   </body>
 </html>
