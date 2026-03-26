@@ -1,6 +1,15 @@
 // ==========================
-// Gestion utilisateur / Auth / Admin communs
+// Constantes et configurations
 // ==========================
+const BASE_URL = "http://localhost:3000/api/decoder";
+const API_URL = "http://localhost:3000/api";
+const DECODER_ADDRESSES = Array.from({ length: 12 }, (_, i) => `127.0.10.${i + 1}`);
+const ACTIONS = ["info", "reset", "reinit", "shutdown"];
+
+// ==========================
+// Gestion utilisateur
+// ==========================
+
 // Fonctions de gestion de l'utilisateur dans le localStorage
 function getUser() {
     return JSON.parse(localStorage.getItem("user"));
@@ -28,20 +37,249 @@ document.addEventListener("DOMContentLoaded", () => {
     const path = window.location.pathname;
 
     // Si l'utilisateur n'est pas connecté et essaie d'accéder à une page protégée, rediriger vers signin
-    const pagesProtegees = ["/pages/dashboard.html", "/pages/GestionDecodeur.html", "/pages/admin.html", "/pages/decodeur.html"];
-    const estPageProtegee = pagesProtegees.includes(path);
-
-    if (!user && estPageProtegee) {
+    if (!user && !path.endsWith("/signin.html") && !path.endsWith("/signup.html")) {
+        alert("Accès refusé : veuillez vous connecter.");
         window.location.href = "/pages/signin.html";
-        return;
-    }
-
-    // Protection spécifique pour la page admin : nécessite un rôle admin
-    if (path === "/pages/admin.html" && (!user || user.role !== "admin")) {
+        // Si l'utilisateur est connecté et essaie d'accéder à signin ou signup, rediriger vers dashboard
+    } else if (user && (path.endsWith("/signin.html") || path.endsWith("/signup.html"))) {
         window.location.href = "/pages/dashboard.html";
-        return;
+        // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à admin.html, rediriger vers signin
+    } else if (user && path.endsWith("/admin.html") && user.role !== "admin") {
+        alert("Accès refusé : page réservée aux administrateurs.");
+        window.location.href = "/pages/signin.html";
     }
 });
+
+// ==========================
+// API Decodeur
+// ==========================
+
+// Validation des entrées
+function isValidDecoderIp(ip) {
+    return DECODER_ADDRESSES.includes(ip);
+}
+
+// Validation de l'action
+function isValidAction(action) {
+    return ACTIONS.includes(action);
+}
+
+// Fonction générique pour faire une requête au serveur pour une action donnée
+async function decoderRequest(id, address, action) {
+    // Validation des entrées
+    if (!id) throw new Error("Code permanent manquant.");
+    if (!isValidDecoderIp(address)) throw new Error("Adresse IP invalide.");
+    if (!isValidAction(action)) throw new Error("Action invalide.");
+
+    // Requête vers le serveur
+    const response = await fetch(BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ id, address, action }),
+    });
+
+    // Gestion des erreurs HTTP et parsing de la réponse
+    const text = await response.text();
+    if (!response.ok) throw new Error(`Erreur HTTP ${response.status} - ${text}`);
+
+    // Parsing de la réponse JSON et gestion des erreurs métier
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error("Réponse du serveur invalide.");
+    }
+    if (data.response !== "OK") throw new Error(data.message || "Erreur serveur");
+
+    // Retour des données
+    return data;
+}
+
+// Fonctions spécifiques pour chaque action (qui appellent la fonction générique)
+async function getDecoderInfo(id, address) {
+    return decoderRequest(id, address, "info");
+}
+async function resetDecoder(id, address) {
+    return decoderRequest(id, address, "reset");
+}
+async function reinitDecoder(id, address) {
+    return decoderRequest(id, address, "reinit");
+}
+async function shutdownDecoder(id, address) {
+    return decoderRequest(id, address, "shutdown");
+}
+
+// Fonction pour obtenir les infos de tous les décodeurs (utile pour admin)
+async function getAllDecodersInfo(id) {
+    const results = [];
+    for (const address of DECODER_ADDRESSES) {
+        try {
+            results.push({ address, ...(await getDecoderInfo(id, address)) });
+        } catch (e) {
+            results.push({ address, response: "Error", message: e.message });
+        }
+    }
+    return results;
+}
+
+// ==========================
+// Fonctions d'interface utilisateur
+// ==========================
+function majEtatDepuisInfo(info, adresse) {
+    const zone = document.getElementById("etat-content");
+    if (!zone) return;
+    const lignes = zone.querySelectorAll("p");
+    if (lignes.length < 4) return;
+    lignes[0].innerHTML = `<strong>Adresse :</strong> ${adresse || ""}`;
+    lignes[1].innerHTML = `<strong>Statut :</strong> ${info?.state || ""}`;
+    lignes[2].innerHTML = `<strong>Actif depuis :</strong> ${info?.lastRestart || ""}`;
+    lignes[3].innerHTML = `<strong>Réinitialisé :</strong> ${info?.lastReinit || ""}`;
+}
+
+// Fonction pour lire le code permanent et l'adresse depuis la page
+// - Sur les pages classiques (GestionDecodeur), on lit les champs visibles
+// - Sur la page decodeur.html, on utilise les variables globales currentDecoderId/currentDecoderAddress
+function lireCodeEtAdresseDepuisPage() {
+    const idFromGlobal = window.currentDecoderId;
+    const addrFromGlobal = window.currentDecoderAddress;
+    if (idFromGlobal && addrFromGlobal) {
+        return { id: idFromGlobal, address: addrFromGlobal };
+    }
+    const idInput = document.getElementById("input-code-permanent-top");
+    const selectAdresse = document.getElementById("select-adresse-decodeur");
+    return { id: idInput?.value?.trim() || "", address: selectAdresse?.value || "" };
+}
+
+// ==========================
+// Boutons Décodeurs
+// ==========================
+// bouton Afficher les infos du décodeur
+async function boutonAfficherClique() {
+    const { id, address } = lireCodeEtAdresseDepuisPage();
+    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+    msg(`Demande d'information pour ${address} (id=${id})`, "info");
+    try {
+        const info = await getDecoderInfo(id, address);
+        msg(info, "success");
+        majEtatDepuisInfo(info, address);
+    } catch (e) {
+        msg("Erreur info: " + e.message, "error");
+    }
+}
+
+// Fonction générique pour les actions qui nécessitent du polling (reset, reinit, shutdown)
+async function boutonResetClique() {
+    const { id, address } = lireCodeEtAdresseDepuisPage();
+    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+    msg(`Reset du décodeur ${address}`, "warning");
+    try {
+        // Afficher les infos dans la page pendant le polling
+        try {
+            const info = await getDecoderInfo(id, address);
+            msg(info, "success");
+            majEtatDepuisInfo(info, address);
+        } catch (err) {
+            msg("Erreur info initiale: " + err.message, "debug");
+        }
+        const res = await resetDecoder(id, address);
+        msg(res, "success");
+        msg("Attente que le décodeur redevienne actif...", "debug");
+        const intervalMs = 5000,
+            timeoutMs = 60000,
+            debut = Date.now();
+        while (true) {
+            if (Date.now() - debut > timeoutMs) {
+                msg("Timeout: le décodeur n'est pas redevenu actif.", "error");
+                break;
+            }
+            await new Promise((r) => setTimeout(r, intervalMs));
+            try {
+                // une premierère requête pour voir si le décodeur est déjà redevenu actif
+                const info = await getDecoderInfo(id, address);
+                if (info.state === "active") {
+                    msg("Le décodeur est redevenu actif !", "success");
+                    msg(info, "success");
+                    majEtatDepuisInfo(info, address);
+                    break;
+                }
+            } catch (err) {
+                msg("Erreur polling info: " + err.message, "debug");
+            }
+        }
+    } catch (e) {
+        msg("Erreur reset: " + e.message, "error");
+    }
+}
+
+// bouton Réinitialiser le décodeur
+async function boutonReinitClique() {
+    const { id, address } = lireCodeEtAdresseDepuisPage();
+    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+    msg(`Réinitialisation du décodeur ${address}`, "warning");
+    try {
+        const res = await reinitDecoder(id, address);
+        msg(res, "success");
+        const info = await getDecoderInfo(id, address);
+        msg(info, "success");
+        majEtatDepuisInfo(info, address);
+    } catch (e) {
+        msg("Erreur reinit: " + e.message, "error");
+    }
+}
+
+async function boutonShutdownClique() {
+    const { id, address } = lireCodeEtAdresseDepuisPage();
+    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
+    msg(`Extinction du décodeur ${address}`, "warning");
+    try {
+        const res = await shutdownDecoder(id, address);
+        msg(res, "success");
+        const info = await getDecoderInfo(id, address);
+        msg(info, "success");
+        majEtatDepuisInfo(info, address);
+    } catch (e) {
+        msg("Erreur shutdown: " + e.message, "error");
+    }
+}
+// Fonction pour mettre les messages des logs des decodeurs en couleur
+function msg(texte, type = "info") {
+    const cont = document.getElementById("messages-content");
+    const now = new Date();
+    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}/${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}/`;
+    const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
+
+    // Définir la couleur selon le type
+    let color;
+    switch (type) {
+        // Les types possibles sont : success, error, warning, debug, info
+        // Cas Vert : succès de l'action
+        case "success":
+            color = "green";
+            break;
+        // Cas Rouge : erreur lors de l'action
+        case "error":
+            color = "red";
+            break;
+        // Cas Orange : action en cours ou avertissement
+        case "warning":
+            color = "orange";
+            break;
+        // Cas Bleu : messages de debug ou d'information détaillée
+        case "debug":
+            color = "blue";
+            break;
+        // Cas Noir : messages d'information généraux ou autres
+        default:
+            color = "black"; // info ou autres
+    }
+
+    const ligne = document.createElement("p");
+    ligne.textContent = `${ts} ${contenu}`;
+    ligne.style.color = color;
+
+    if (cont) cont.appendChild(ligne);
+    else console.log(`${ts} ${contenu}`);
+}
 
 // ==========================
 // Signin / Signup
@@ -230,8 +468,287 @@ function createClientLine(client) {
 }
 
 // ==========================
-// Fonctions Dashboard (définies dans dashboard.js)
+// Dashboard / UI
 // ==========================
+
+// Affichage des infos de l'utilisateur dans le header et gestion de la visibilité du lien admin
+function displayUserInfo() {
+    const user = getUser();
+    const el = document.getElementById("user-info");
+    if (!el) return;
+    el.innerHTML = user ? `Connecté en tant que <strong>${user.nom}</strong>` : "Non connecté";
+}
+
+// Affichage d'un résumé des décodeurs pour l'utilisateur (nombre total / actifs)
+async function displayUserSummary() {
+    const user = getUser();
+    const el = document.getElementById("user-info");
+    if (!el || !user) return;
+
+    try {
+        const res = await fetch(`${API_URL}/users`);
+        const users = await res.json();
+        const fullUser = users.find((u) => u.email === user.email);
+        const codePermanent = fullUser?.codePermanent || user.codePermanent || null;
+        const decoders = fullUser?.decodeurs || [];
+
+        if (!codePermanent || !decoders.length) {
+            el.innerHTML = `Connecté en tant que <strong>${user.nom}</strong><br><small>Aucun décodeur associé à votre compte.</small>`;
+            return;
+        }
+
+        // Récupérer l'état de chaque décodeur en parallèle
+        const infoList = await Promise.all(
+            decoders.map(async (address) => {
+                try {
+                    const info = await getDecoderInfo(codePermanent, address);
+                    return info;
+                } catch {
+                    return null;
+                }
+            })
+        );
+
+        const total = decoders.length;
+        const actifs = infoList.filter(
+            (info) => info && info.state && ["actif", "active"].includes(String(info.state).toLowerCase())
+        ).length;
+        const inactifs = total - actifs;
+
+        el.innerHTML = `Connecté en tant que <strong>${user.nom}</strong><br>` +
+            `<small>${total} décodeur${total > 1 ? "s" : ""} associé${total > 1 ? "s" : ""} — ` +
+            `${actifs} actif${actifs > 1 ? "s" : ""}, ${inactifs} inactif${inactifs > 1 ? "s" : ""}</small>`;
+    } catch (e) {
+        console.error("Erreur lors de l'affichage du résumé utilisateur:", e);
+        el.innerHTML = `Connecté en tant que <strong>${user.nom}</strong>`;
+    }
+}
+
+// Afficher un encadré par décodeur associé à l'utilisateur connecté,
+// en réutilisant la même logique que boutonAfficherClique pour chaque décodeur
+async function displayUserDecoders() {
+    const container = document.getElementById("user-decoders");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const current = getUser();
+    if (!current) {
+        container.innerHTML = "<p>Utilisateur non connecté.</p>";
+        return;
+    }
+
+    try {
+    // 1) Récupérer les utilisateurs depuis le backend (users.json)
+        const res = await fetch(`${API_URL}/users`);
+        const users = await res.json();
+
+        // 2) Trouver l'utilisateur complet pour avoir codePermanent + decodeurs
+        const fullUser = users.find((u) => u.email === current.email);
+        const codePermanent = fullUser?.codePermanent || current.codePermanent || null;
+        const decoders = fullUser?.decodeurs || [];
+
+        if (!codePermanent || !decoders.length) {
+            container.innerHTML = "<p>Aucun décodeur associé à votre compte.</p>";
+            return;
+        }
+
+    // 3) Pour chaque décodeur, faire comme boutonAfficherClique (msg + getDecoderInfo)
+        for (let i = 0; i < decoders.length; i++) {
+            const address = decoders[i];
+
+            const card = document.createElement("div");
+            card.className = "decoder-card";
+            container.appendChild(card);
+
+            // Même validation que dans boutonAfficherClique
+            if (!codePermanent || !address) {
+                msg("Code permanent ou adresse manquant", "error");
+                card.innerHTML = `
+                    <h3>Décodeur ${i + 1}</h3>
+                    <p><strong>Adresse :</strong> ${address}</p>
+                    <p><strong>Statut :</strong> Erreur: code permanent ou adresse manquant</p>
+                `;
+                continue;
+            }
+
+            // Fonction interne pour rafraîchir l'état de cette carte
+            const refreshCard = async () => {
+                msg(`Demande d'information pour ${address} (id=${codePermanent})`, "info");
+                try {
+                    const info = await getDecoderInfo(codePermanent, address);
+                    msg(info, "success");
+
+                    const status = info?.state || "Inconnu";
+                    const isActive = status && ["actif", "active"].includes(status.toLowerCase());
+                    const statusClass = isActive ? "status-active" : "status-inactive";
+
+                    // Carte simplifiée : barre de statut, titre, adresse et statut seulement
+                    card.innerHTML = `
+                        <div class="decoder-card-layout">
+                            <div class="decoder-status-bar ${statusClass}"></div>
+                            <div class="decoder-card-content">
+                                <div class="decoder-info">
+                                    <h3>Décodeur ${i + 1}</h3>
+                                    <p><strong>Adresse :</strong> ${address}</p>
+                                    <p class="decoder-status-text"><strong>Statut :</strong> ${status}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Rendre la carte cliquable pour ouvrir la page décodeur pré-remplie
+                    card.style.cursor = "pointer";
+                    card.onclick = () => {
+                        const params = new URLSearchParams({
+                            codePermanent,
+                            address,
+                        });
+                        window.location.href = `/pages/decodeur.html?${params.toString()}`;
+                    };
+
+                    // Plus de boutons d'action dans les cartes du dashboard
+                    const btnReset = null;
+                    const btnReinit = null;
+                    const btnShutdown = null;
+
+                    if (btnReset) {
+                        btnReset.addEventListener("click", async () => {
+                            msg(`Reset du décodeur ${address}`, "warning");
+                            try {
+                                // Désactive et grise le bouton Reset
+                                btnReset.disabled = true;
+                                btnReset.classList.add("btn-reset-disabled");
+
+                                // Met à jour immédiatement le statut visuel
+                                const statusTextEl = card.querySelector(".decoder-status-text");
+                                if (statusTextEl) {
+                                    statusTextEl.innerHTML = `<strong>Statut :</strong> Reset en cours`;
+                                }
+
+                                const res = await resetDecoder(codePermanent, address);
+                                msg(res, "success");
+
+                                // Après un reset, on redemande l'état toutes les 5 secondes
+                                const intervalId = setInterval(async () => {
+                                    try {
+                                        const infoPoll = await getDecoderInfo(codePermanent, address);
+                                        const statusPoll = infoPoll?.state || "Inconnu";
+                                        msg(infoPoll, "info");
+                                        // On rafraîchit la carte avec le nouvel état
+                                        const lastRestartPoll = infoPoll?.lastRestart || "N/A";
+                                        const lastReinitPoll = infoPoll?.lastReinit || "N/A";
+
+                                        const isActivePoll = statusPoll && ["actif", "active"].includes(statusPoll.toLowerCase());
+                                        const statusBar = card.querySelector(".decoder-status-bar");
+                                        if (statusBar) {
+                                            statusBar.classList.toggle("status-active", isActivePoll);
+                                            statusBar.classList.toggle("status-inactive", !isActivePoll);
+                                        }
+
+                                        const statusTextEl = card.querySelector(".decoder-status-text");
+                                        const lastRestartEl = card.querySelector(".decoder-last-restart");
+                                        const lastReinitEl = card.querySelector(".decoder-last-reinit");
+                                        // Tant que le décodeur n'est pas revenu actif, on garde "Reset en cours"
+                                        if (statusTextEl) {
+                                            if (isActivePoll) {
+                                                statusTextEl.innerHTML = `<strong>Statut :</strong> ${statusPoll}`;
+                                            } else {
+                                                statusTextEl.innerHTML = `<strong>Statut :</strong> Reset en cours`;
+                                            }
+                                        }
+                                        if (lastRestartEl) lastRestartEl.innerHTML = `<strong>Actif depuis :</strong> ${lastRestartPoll}`;
+                                        if (lastReinitEl) lastReinitEl.innerHTML = `<strong>Dernière réinit :</strong> ${lastReinitPoll}`;
+
+                                        // Si l'état redevient actif, on arrête le polling et on réactive le bouton Reset
+                                        if (statusPoll && ["actif", "active"].includes(statusPoll.toLowerCase())) {
+                                            clearInterval(intervalId);
+                                            btnReset.disabled = false;
+                                            btnReset.classList.remove("btn-reset-disabled");
+                                        }
+                                    } catch (pollErr) {
+                                        msg("Erreur lors du polling de l'état: " + pollErr.message, "error");
+                                        clearInterval(intervalId);
+                                    }
+                                }, 5000);
+                            } catch (e) {
+                                msg("Erreur reset: " + e.message, "error");
+                            }
+                        });
+                    }
+
+                    if (btnReinit) {
+                        btnReinit.addEventListener("click", async () => {
+                            msg(`Réinitialisation du décodeur ${address}`, "warning");
+                            try {
+                                const res = await reinitDecoder(codePermanent, address);
+                                msg(res, "success");
+                                // Après réinit, on rafraîchit une fois l'état
+                                await refreshCard();
+                            } catch (e) {
+                                msg("Erreur reinit: " + e.message, "error");
+                            }
+                        });
+                    }
+
+                    if (btnShutdown) {
+                        btnShutdown.addEventListener("click", async () => {
+                            msg(`Extinction du décodeur ${address}`, "warning");
+                            try {
+                                const res = await shutdownDecoder(codePermanent, address);
+                                msg(res, "success");
+                                // Après extinction, on rafraîchit une fois l'état
+                                await refreshCard();
+                            } catch (e) {
+                                msg("Erreur shutdown: " + e.message, "error");
+                            }
+                        });
+                    }
+                } catch (e) {
+                    msg("Erreur info: " + e.message, "error");
+                    card.innerHTML = `
+                        <h3>Décodeur ${i + 1}</h3>
+                        <p><strong>Adresse :</strong> ${address}</p>
+                        <p><strong>Statut :</strong> Erreur: ${e.message}</p>
+                    `;
+                }
+            };
+
+            // Premier remplissage de la carte
+            await refreshCard();
+        }
+        // Met à jour le timestamp de dernière mise à jour si tout s'est bien passé
+        const lastUpdateEl = document.getElementById("last-update");
+        if (lastUpdateEl) {
+            const now = new Date();
+            const heures = String(now.getHours()).padStart(2, "0");
+            const minutes = String(now.getMinutes()).padStart(2, "0");
+            const secondes = String(now.getSeconds()).padStart(2, "0");
+            lastUpdateEl.textContent = `Dernière mise à jour : ${heures}:${minutes}:${secondes}`;
+        }
+        // Met aussi à jour le résumé utilisateur (nombre de décodeurs actifs/inactifs)
+        await displayUserSummary();
+    } catch (e) {
+        console.error("Erreur lors du chargement des décodeurs:", e);
+        container.innerHTML = "<p>Erreur lors du chargement de vos décodeurs.</p>";
+    }
+}
+
+// Affichage du lien admin dans la nav si l'utilisateur est admin
+function displayNav() {
+    const user = getUser();
+    const adminLink = document.getElementById("nav-admin-link");
+    if (adminLink) adminLink.style.display = user && user.role === "admin" ? "inline" : "none";
+}
+
+// Mise en surbrillance du lien actif dans la nav
+function highlightActiveLink() {
+    const links = document.querySelectorAll(".nav-links a");
+    const currentPath = window.location.pathname.split("/").pop();
+    links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === currentPath);
+    });
+}
 
 // ==========================
 // Initialisation DOM
@@ -250,15 +767,7 @@ function initialiserUI() {
     const btnChargerDepuisUser = document.getElementById("btn-charger-depuis-user");
 
     // Ajout des écouteurs d'événements pour les boutons
-    if (btnAfficher) {
-        btnAfficher.addEventListener("click", async () => {
-            await boutonAfficherClique();
-            const { id, address } = lireCodeEtAdresseDepuisPage();
-            if (id && address && typeof rafraichirAffichageChaines === "function") {
-                rafraichirAffichageChaines(id, address);
-            }
-        });
-    }
+    if (btnAfficher) btnAfficher.addEventListener("click", boutonAfficherClique);
     if (btnRefreshDecoders) btnRefreshDecoders.addEventListener("click", displayUserDecoders);
     if (btnReset) btnReset.addEventListener("click", boutonResetClique);
     if (btnReinit) btnReinit.addEventListener("click", boutonReinitClique);
@@ -335,11 +844,6 @@ function chargerDecodeurDepuisSelectionUser() {
 
     // Réutiliser la logique existante
     boutonAfficherClique();
-
-    // Charger aussi les chaînes associées à ce décodeur, si la fonction existe
-    if (typeof rafraichirAffichageChaines === "function") {
-        rafraichirAffichageChaines(codePermanent, address);
-    }
 }
 
 // Initialisation au chargement de la page
@@ -361,5 +865,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// Exposer seulement les fonctions d'authentification si besoin en global
-window.AppAuth = { signin, signup, logout };
+// Exposition des fonctions API pour les boutons de la page
+window.DecodeurAPI = { getDecoderInfo, resetDecoder, reinitDecoder, shutdownDecoder, getAllDecodersInfo, signin, signup, logout };
