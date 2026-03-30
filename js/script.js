@@ -51,10 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================
-// API Decodeur
+// API Décodeur : appels via backend (vérifier si notre server node run avant)
 // ==========================
 
-// Validation des entrées
+// Validation de l'adresse IP du décodeur 
 function isValidDecoderIp(ip) {
     return DECODER_ADDRESSES.includes(ip);
 }
@@ -64,7 +64,7 @@ function isValidAction(action) {
     return ACTIONS.includes(action);
 }
 
-// Fonction générique pour faire une requête au serveur pour une action donnée
+// Fonction générique qui envoie une action (info / reset / reinit / shutdown)
 async function decoderRequest(id, address, action) {
     // Validation des entrées
     if (!id) throw new Error("Code permanent manquant.");
@@ -78,11 +78,11 @@ async function decoderRequest(id, address, action) {
         body: JSON.stringify({ id, address, action }),
     });
 
-    // Gestion des erreurs HTTP et parsing de la réponse
+    // Gestion des erreurs
     const text = await response.text();
     if (!response.ok) throw new Error(`Erreur HTTP ${response.status} - ${text}`);
 
-    // Parsing de la réponse JSON et gestion des erreurs métier
+    // Parsing
     let data;
     try {
         data = JSON.parse(text);
@@ -95,7 +95,7 @@ async function decoderRequest(id, address, action) {
     return data;
 }
 
-// Fonctions spécifiques pour chaque action (qui appellent la fonction générique)
+// Fonctions spécifiques pour actions
 async function getDecoderInfo(id, address) {
     return decoderRequest(id, address, "info");
 }
@@ -109,7 +109,7 @@ async function shutdownDecoder(id, address) {
     return decoderRequest(id, address, "shutdown");
 }
 
-// Fonction pour obtenir les infos de tous les décodeurs (utile pour admin)
+// Fonction infos
 async function getAllDecodersInfo(id) {
     const results = [];
     for (const address of DECODER_ADDRESSES) {
@@ -123,7 +123,7 @@ async function getAllDecodersInfo(id) {
 }
 
 // ==========================
-// Fonctions d'interface utilisateur
+// Fonctions d'interface 
 // ==========================
 function majEtatDepuisInfo(info, adresse) {
     const zone = document.getElementById("etat-content");
@@ -137,8 +137,6 @@ function majEtatDepuisInfo(info, adresse) {
 }
 
 // Fonction pour lire le code permanent et l'adresse depuis la page
-// - Sur les pages classiques (GestionDecodeur), on lit les champs visibles
-// - Sur la page decodeur.html, on utilise les variables globales currentDecoderId/currentDecoderAddress
 function lireCodeEtAdresseDepuisPage() {
     const idFromGlobal = window.currentDecoderId;
     const addrFromGlobal = window.currentDecoderAddress;
@@ -151,9 +149,9 @@ function lireCodeEtAdresseDepuisPage() {
 }
 
 // ==========================
-// Boutons Décodeurs
+// Boutons page Décodeurs 
 // ==========================
-// bouton Afficher les infos du décodeur
+// Bouton "Afficher" 
 async function boutonAfficherClique() {
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
@@ -167,13 +165,13 @@ async function boutonAfficherClique() {
     }
 }
 
-// Fonction générique pour les actions qui nécessitent du polling (reset, reinit, shutdown)
+// Fonction avec polling
 async function boutonResetClique() {
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
     msg(`Reset du décodeur ${address}`, "warning");
     try {
-        // Afficher les infos dans la page pendant le polling
+        // Afficher les infos dans la page 
         try {
             const info = await getDecoderInfo(id, address);
             msg(info, "success");
@@ -194,7 +192,7 @@ async function boutonResetClique() {
             }
             await new Promise((r) => setTimeout(r, intervalMs));
             try {
-                // une premierère requête pour voir si le décodeur est déjà redevenu actif
+                // on vérifie si le décodeur est rendu actif ou nope
                 const info = await getDecoderInfo(id, address);
                 if (info.state === "active") {
                     msg("Le décodeur est redevenu actif !", "success");
@@ -211,7 +209,7 @@ async function boutonResetClique() {
     }
 }
 
-// bouton Réinitialiser le décodeur
+// Bouton "Réinitialiser" le décodeur
 async function boutonReinitClique() {
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
@@ -227,6 +225,7 @@ async function boutonReinitClique() {
     }
 }
 
+// Bouton "Éteindre" le décodeur
 async function boutonShutdownClique() {
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
@@ -468,10 +467,10 @@ function createClientLine(client) {
 }
 
 // ==========================
-// Dashboard / UI
+// Dashboard / UI 
 // ==========================
 
-// Affichage des infos de l'utilisateur dans le header et gestion de la visibilité du lien admin
+// Affiche "Connecté en tant que ..." dans le header du dashboard
 function displayUserInfo() {
     const user = getUser();
     const el = document.getElementById("user-info");
@@ -479,7 +478,7 @@ function displayUserInfo() {
     el.innerHTML = user ? `Connecté en tant que <strong>${user.nom}</strong>` : "Non connecté";
 }
 
-// Affichage d'un résumé des décodeurs pour l'utilisateur (nombre total / actifs)
+// Affiche un petit résumé sous le nom d'utilisateur (fac nbr de décodeur/actifs/inactifs)
 async function displayUserSummary() {
     const user = getUser();
     const el = document.getElementById("user-info");
@@ -497,7 +496,7 @@ async function displayUserSummary() {
             return;
         }
 
-        // Récupérer l'état de chaque décodeur en parallèle
+        // Récupérer l'état de chaque décodeur (peux être optimisé maybe, actuellement en parallèle)
         const infoList = await Promise.all(
             decoders.map(async (address) => {
                 try {
@@ -524,8 +523,7 @@ async function displayUserSummary() {
     }
 }
 
-// Afficher un encadré par décodeur associé à l'utilisateur connecté,
-// en réutilisant la même logique que boutonAfficherClique pour chaque décodeur
+// Affiche une carte par décodeur associé à l'utilisateur connecté
 async function displayUserDecoders() {
     const container = document.getElementById("user-decoders");
     if (!container) return;
@@ -552,8 +550,6 @@ async function displayUserDecoders() {
             container.innerHTML = "<p>Aucun décodeur associé à votre compte.</p>";
             return;
         }
-
-    // 3) Pour chaque décodeur, faire comme boutonAfficherClique (msg + getDecoderInfo)
         for (let i = 0; i < decoders.length; i++) {
             const address = decoders[i];
 
@@ -572,7 +568,7 @@ async function displayUserDecoders() {
                 continue;
             }
 
-            // Fonction interne pour rafraîchir l'état de cette carte
+            // Fonction interne pour refresh
             const refreshCard = async () => {
                 msg(`Demande d'information pour ${address} (id=${codePermanent})`, "info");
                 try {
@@ -583,7 +579,7 @@ async function displayUserDecoders() {
                     const isActive = status && ["actif", "active"].includes(status.toLowerCase());
                     const statusClass = isActive ? "status-active" : "status-inactive";
 
-                    // Carte simplifiée : barre de statut, titre, adresse et statut seulement
+                    // Carte simplifiée
                     card.innerHTML = `
                         <div class="decoder-card-layout">
                             <div class="decoder-status-bar ${statusClass}"></div>
@@ -597,7 +593,7 @@ async function displayUserDecoders() {
                         </div>
                     `;
 
-                    // Rendre la carte cliquable pour ouvrir la page décodeur pré-remplie
+                    // Carte cliquable
                     card.style.cursor = "pointer";
                     card.onclick = () => {
                         const params = new URLSearchParams({
@@ -607,7 +603,7 @@ async function displayUserDecoders() {
                         window.location.href = `/pages/decodeur.html?${params.toString()}`;
                     };
 
-                    // Plus de boutons d'action dans les cartes du dashboard
+                    // Plus de boutons 
                     const btnReset = null;
                     const btnReinit = null;
                     const btnShutdown = null;
@@ -620,7 +616,7 @@ async function displayUserDecoders() {
                                 btnReset.disabled = true;
                                 btnReset.classList.add("btn-reset-disabled");
 
-                                // Met à jour immédiatement le statut visuel
+                                // met a jour le statut visuel 
                                 const statusTextEl = card.querySelector(".decoder-status-text");
                                 if (statusTextEl) {
                                     statusTextEl.innerHTML = `<strong>Statut :</strong> Reset en cours`;
@@ -693,14 +689,14 @@ async function displayUserDecoders() {
 
                     if (btnShutdown) {
                         btnShutdown.addEventListener("click", async () => {
-                            msg(`Extinction du décodeur ${address}`, "warning");
+                            msg(`Fermeture du décodeur ${address}`, "warning");
                             try {
                                 const res = await shutdownDecoder(codePermanent, address);
                                 msg(res, "success");
-                                // Après extinction, on rafraîchit une fois l'état
+                                // Après le shutdown, on rafraîchit une fois l'état
                                 await refreshCard();
                             } catch (e) {
-                                msg("Erreur shutdown: " + e.message, "error");
+                                msg("Erreur fermeture: " + e.message, "error");
                             }
                         });
                     }
@@ -751,10 +747,10 @@ function highlightActiveLink() {
 }
 
 // ==========================
-// Initialisation DOM
+// Initialisation DOM (tous les écrans)
 // ==========================
 
-// Fonction pour initialiser les événements du DOM
+// Branche tous les listenenrs sur les boutons 
 function initialiserUI() {
     const btnAfficher = document.getElementById("btn-afficher-decodeur");
     const btnRefreshDecoders = document.getElementById("btn-refresh-decoders");
@@ -766,14 +762,14 @@ function initialiserUI() {
     const selectUserDecoder = document.getElementById("select-user-decoder");
     const btnChargerDepuisUser = document.getElementById("btn-charger-depuis-user");
 
-    // Ajout des écouteurs d'événements pour les boutons
+    // Ajout des eventlisteners pour les boutons
     if (btnAfficher) btnAfficher.addEventListener("click", boutonAfficherClique);
     if (btnRefreshDecoders) btnRefreshDecoders.addEventListener("click", displayUserDecoders);
     if (btnReset) btnReset.addEventListener("click", boutonResetClique);
     if (btnReinit) btnReinit.addEventListener("click", boutonReinitClique);
     if (btnShutdown) btnShutdown.addEventListener("click", boutonShutdownClique);
 
-    // Initialisation de la sélection par utilisateur (admin)
+    // Initialisation de la sélection par utilisateur 
     if (selectUserAdmin && selectUserDecoder) {
         initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDecoder);
     }
@@ -817,9 +813,7 @@ async function initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDec
         console.error("Erreur lors de l'initialisation de la sélection utilisateur (admin):", e);
     }
 }
-
-// Quand on clique sur "Charger", on copie le code permanent + adresse dans les champs existants
-// puis on réutilise la logique du bouton Afficher
+// on charge un décodeur depuis un code permanent
 function chargerDecodeurDepuisSelectionUser() {
     const selectUserAdmin = document.getElementById("select-user-admin");
     const selectUserDecoder = document.getElementById("select-user-decoder");
@@ -846,7 +840,7 @@ function chargerDecodeurDepuisSelectionUser() {
     boutonAfficherClique();
 }
 
-// Initialisation au chargement de la page
+// Initialisation au chargement de la page 
 document.addEventListener("DOMContentLoaded", async () => {
     initialiserUI();
     displayUserInfo();
@@ -856,12 +850,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     highlightActiveLink();
     await displayClients();
 
-    // Rafraîchissement automatique de l'état des décodeurs toutes les 10 secondes sur le dashboard
+    // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard
     const currentPath = window.location.pathname.split("/").pop();
     if (currentPath === "dashboard.html") {
         setInterval(() => {
             displayUserDecoders();
-        }, 10000); // 10 000 ms = 10 secondes
+        }, 30000); // 30 000 ms = 30 secondes
     }
 });
 
