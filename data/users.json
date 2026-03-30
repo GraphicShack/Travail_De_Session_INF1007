@@ -4,7 +4,9 @@
     "nom": "Alec",
     "email": "paquette.alecc@gmail.com",
     "motDePasse": "-1083238412",
-    "role": "admin"
+    "role": "admin",
+    "decodeurs" : ["127.0.10.1","127.0.10.2","127.0.10.3","127.0.10.4","127.0.10.5","127.0.10.6","127.0.10.7","127.0.10.8"],
+    "Chaines" : []
   },
   {
     "id": 2,
@@ -12,5 +14,15 @@
     "email": "paquette.alecc2@gmail.com",
     "motDePasse": "-1083238412",
     "role": "user"
+  },
+  {
+    "id": 3,
+    "nom": "Test",
+    "codePermanent" : "LEFF87100303",
+    "email": "test@gmail.com",
+    "motDePasse": "-1083238412",
+    "role": "user",
+    "decodeurs" : ["127.0.10.1","127.0.10.2","127.0.10.3","127.0.10.4"],
+    "Chaines" : []
   }
 ]

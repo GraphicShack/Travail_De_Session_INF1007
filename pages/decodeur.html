@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>INF1007 — Décodeur</title>
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="dashboard.html">Simulateur Décodeurs</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="GestionDecodeur.html">Décodeurs</a></li>
+                <li><a href="admin.html" id="nav-admin-link">Admin</a></li>
+            </ul>
+            <div class="nav-logout">
+                <button id="btn-logout">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+  <div class="container">
+      <header>
+        <h1>Décodeur</h1>
+      </header>
+
+      <main>
+        <fieldset>
+          <legend>Gestion de votre décodeur</legend>
+
+  <section id="etat">
+          <h2>État de votre décodeur</h2>
+
+          <fieldset>
+            <legend>Informations du décodeur</legend>
+            <div id="etat-content">
+              <p><strong>Adresse :</strong> </p>
+              <p><strong>Statut :</strong> </p>
+              <p><strong>Actif depuis :</strong> </p>
+              <p><strong>Réinitialisé :</strong> </p>
+            </div>
+            <fieldset>
+              <legend>Actions rapides</legend>
+              <div id="actions-content">
+                <button id="btn-reset-decodeur" type="button">Redémarrer</button>
+                <button id="btn-reinit-decodeur" type="button">Réinitialiser</button>
+                <button id="btn-shutdown-decodeur" type="button">Éteindre</button>
+              </div>
+            </fieldset>
+          </fieldset>
+
+        </section>
+
+
+  <section id="Chaines">
+          <h2>Chaînes</h2>
+          <fieldset>
+            <legend>Liste des chaines</legend>
+            <div id="chaines-content">
+              <ul>
+              </ul>
+            </div>
+            <fieldset>
+              <legend>Actions rapides</legend>
+              <div id="chaines-actions-content">
+                <button type="button">Ajouter une Chaine</button>
+                <button type="button">Supprimer une Chaine</button>
+              </div>
+            </fieldset>
+          </fieldset>
+        </section>
+
+        <fieldset>
+          <legend>Messages</legend>
+          <div id="messages-content"></div>
+        </fieldset>
+
+        </fieldset>
+
+      </main>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 INF1007 - Projet de session</p>
+    </div>
+
+  <script src="../js/script.js"></script>
+  <script>
+    // Préremplissage et affichage automatique depuis les paramètres d'URL
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const codePermanent = params.get('codePermanent');
+      const address = params.get('address');
+
+      // On stocke ces infos dans des variables globales pour que les boutons les utilisent
+      window.currentDecoderId = codePermanent;
+      window.currentDecoderAddress = address;
+
+      if (codePermanent && address && window.DecodeurAPI) {
+        try {
+          const info = await window.DecodeurAPI.getDecoderInfo(codePermanent, address);
+          // Réutilise la fonction existante pour mettre à jour l'affichage
+          if (typeof majEtatDepuisInfo === 'function') {
+            majEtatDepuisInfo(info, address);
+          }
+        } catch (e) {
+          console.error('Erreur lors du chargement du décodeur:', e);
+        }
+      }
+    });
+  </script>
+  </body>
+</html>
