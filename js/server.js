@@ -65,10 +65,7 @@ app.post("/api/login", (req, res) => {
       id: userData.id,
       nom: userData.nom,
       email: userData.email,
-      role: userData.role,
-      codePermanent: userData.codePermanent || null,
-      decodeurs: userData.decodeurs || [],
-      chaines: userData.Chaines || userData.chaines || []
+      role: userData.role
     };
 
     res.json({
