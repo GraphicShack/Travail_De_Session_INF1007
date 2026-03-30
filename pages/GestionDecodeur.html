@@ -22,16 +22,17 @@
             </div>
         </div>
     </nav>
-        <header>
-      <h1>Gestion du décodeur</h1>
-    </header>
+    <div class="container">
+      <header>
+        <h1>Gestion des décodeurs - ADMIN</h1>
+      </header>
 
-    <main>
-      <fieldset>
-        <legend>Gestion de votre décodeur</legend>
+      <main>
+        <fieldset>
+          <legend>Gestion du décodeur</legend>
 
         <section id="etat">
-          <h2>État de votre décodeur</h2>
+          <h2>État du décodeur</h2>
           <fieldset>
             <legend>Sélection du décodeur</legend>
           <p>
@@ -55,6 +56,25 @@
               </select>
             </label>
             <button id="btn-afficher-decodeur" type="button">Afficher</button>
+          </p>
+
+          <hr>
+
+          <p><strong>Ou sélectionner par utilisateur :</strong></p>
+          <p>
+            <label>Utilisateur :
+              <select id="select-user-admin">
+                <option value="">-- choisir un utilisateur --</option>
+              </select>
+            </label>
+          </p>
+          <p>
+            <label>Décodeur de cet utilisateur :
+              <select id="select-user-decoder">
+                <option value="">-- choisir un décodeur --</option>
+              </select>
+            </label>
+            <button id="btn-charger-depuis-user" type="button">Charger</button>
           </p>
           </fieldset>
 
@@ -104,13 +124,14 @@
           </div>
         </fieldset>
 
-      </fieldset>
+        </fieldset>
 
-    </main>
+      </main>
+    </div>
 
-    <footer>
+    <div class="footer">
         <p>&copy; 2026 INF1007 - Projet de session</p>
-    </footer>
+    </div>
 
     <script src="../js/script.js"></script>
   </body>

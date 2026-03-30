@@ -5,9 +5,11 @@ export default class Utilisateur {
 
         this.id = id
         this.nom = nom
+        this.codePermanent = codePermanent
         this.email = email
         this.motDePasse = motDePasse
         this.decodeurs = []
+        this.chaines = []
 
     }
 
