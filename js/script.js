@@ -14,23 +14,13 @@ const ACTIONS = ["info", "reset", "reinit", "shutdown"];
 function getUser() {
     return JSON.parse(localStorage.getItem("user"));
 }
-function getUser() {
-    return JSON.parse(localStorage.getItem("user"));
-}
 
 // Fonction pour stocker l'utilisateur dans le localStorage
 function setUser(user) {
     localStorage.setItem("user", JSON.stringify(user));
 }
-function setUser(user) {
-    localStorage.setItem("user", JSON.stringify(user));
-}
 
 // Fonction de déconnexion
-function logout() {
-    localStorage.removeItem("user");
-    window.location.href = "/pages/signin.html";
-}
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "/pages/signin.html";
@@ -42,26 +32,10 @@ function logout() {
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("btn-logout");
     if (logoutBtn) logoutBtn.addEventListener("click", logout);
-    const logoutBtn = document.getElementById("btn-logout");
-    if (logoutBtn) logoutBtn.addEventListener("click", logout);
 
     const user = getUser();
     const path = window.location.pathname;
-    const user = getUser();
-    const path = window.location.pathname;
 
-    // Si l'utilisateur n'est pas connecté et essaie d'accéder à une page protégée, rediriger vers signin
-    if (!user && !path.endsWith("/signin.html") && !path.endsWith("/signup.html")) {
-        alert("Accès refusé : veuillez vous connecter.");
-        window.location.href = "/pages/signin.html";
-        // Si l'utilisateur est connecté et essaie d'accéder à signin ou signup, rediriger vers dashboard
-    } else if (user && (path.endsWith("/signin.html") || path.endsWith("/signup.html"))) {
-        window.location.href = "/pages/dashboard.html";
-        // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à admin.html, rediriger vers signin
-    } else if (user && path.endsWith("/admin.html") && user.role !== "admin") {
-        alert("Accès refusé : page réservée aux administrateurs.");
-        window.location.href = "/pages/signin.html";
-    }
     // Si l'utilisateur n'est pas connecté et essaie d'accéder à une page protégée, rediriger vers signin
     if (!user && !path.endsWith("/signin.html") && !path.endsWith("/signup.html")) {
         alert("Accès refusé : veuillez vous connecter.");
@@ -80,15 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // API Décodeur : appels via backend (vérifier si notre server node run avant)
 // ==========================
 
-// Validation de l'adresse IP du décodeur 
+// Validation de l'adresse IP du décodeur
 function isValidDecoderIp(ip) {
     return DECODER_ADDRESSES.includes(ip);
 }
 
 // Validation de l'action
-function isValidAction(action) {
-    return ACTIONS.includes(action);
-}
 function isValidAction(action) {
     return ACTIONS.includes(action);
 }
@@ -99,17 +70,7 @@ async function decoderRequest(id, address, action) {
     if (!id) throw new Error("Code permanent manquant.");
     if (!isValidDecoderIp(address)) throw new Error("Adresse IP invalide.");
     if (!isValidAction(action)) throw new Error("Action invalide.");
-    // Validation des entrées
-    if (!id) throw new Error("Code permanent manquant.");
-    if (!isValidDecoderIp(address)) throw new Error("Adresse IP invalide.");
-    if (!isValidAction(action)) throw new Error("Action invalide.");
 
-    // Requête vers le serveur
-    const response = await fetch(BASE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ id, address, action }),
-    });
     // Requête vers le serveur
     const response = await fetch(BASE_URL, {
         method: "POST",
@@ -130,8 +91,6 @@ async function decoderRequest(id, address, action) {
     }
     if (data.response !== "OK") throw new Error(data.message || "Erreur serveur");
 
-    // Retour des données
-    return data;
     // Retour des données
     return data;
 }
@@ -161,29 +120,12 @@ async function getAllDecodersInfo(id) {
         }
     }
     return results;
-    const results = [];
-    for (const address of DECODER_ADDRESSES) {
-        try {
-            results.push({ address, ...(await getDecoderInfo(id, address)) });
-        } catch (e) {
-            results.push({ address, response: "Error", message: e.message });
-        }
-    }
-    return results;
 }
 
 // ==========================
-// Fonctions d'interface 
+// Fonctions d'interface
 // ==========================
 function majEtatDepuisInfo(info, adresse) {
-    const zone = document.getElementById("etat-content");
-    if (!zone) return;
-    const lignes = zone.querySelectorAll("p");
-    if (lignes.length < 4) return;
-    lignes[0].innerHTML = `<strong>Adresse :</strong> ${adresse || ""}`;
-    lignes[1].innerHTML = `<strong>Statut :</strong> ${info?.state || ""}`;
-    lignes[2].innerHTML = `<strong>Actif depuis :</strong> ${info?.lastRestart || ""}`;
-    lignes[3].innerHTML = `<strong>Réinitialisé :</strong> ${info?.lastReinit || ""}`;
     const zone = document.getElementById("etat-content");
     if (!zone) return;
     const lignes = zone.querySelectorAll("p");
@@ -207,20 +149,10 @@ function lireCodeEtAdresseDepuisPage() {
 }
 
 // ==========================
-// Boutons page Décodeurs 
+// Boutons page Décodeurs
 // ==========================
-// Bouton "Afficher" 
+// Bouton "Afficher"
 async function boutonAfficherClique() {
-    const { id, address } = lireCodeEtAdresseDepuisPage();
-    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
-    msg(`Demande d'information pour ${address} (id=${id})`, "info");
-    try {
-        const info = await getDecoderInfo(id, address);
-        msg(info, "success");
-        majEtatDepuisInfo(info, address);
-    } catch (e) {
-        msg("Erreur info: " + e.message, "error");
-    }
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
     msg(`Demande d'information pour ${address} (id=${id})`, "info");
@@ -239,7 +171,7 @@ async function boutonResetClique() {
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
     msg(`Reset du décodeur ${address}`, "warning");
     try {
-        // Afficher les infos dans la page 
+        // Afficher les infos dans la page
         try {
             const info = await getDecoderInfo(id, address);
             msg(info, "success");
@@ -291,34 +223,10 @@ async function boutonReinitClique() {
     } catch (e) {
         msg("Erreur reinit: " + e.message, "error");
     }
-    const { id, address } = lireCodeEtAdresseDepuisPage();
-    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
-    msg(`Réinitialisation du décodeur ${address}`, "warning");
-    try {
-        const res = await reinitDecoder(id, address);
-        msg(res, "success");
-        const info = await getDecoderInfo(id, address);
-        msg(info, "success");
-        majEtatDepuisInfo(info, address);
-    } catch (e) {
-        msg("Erreur reinit: " + e.message, "error");
-    }
 }
 
 // Bouton "Éteindre" le décodeur
 async function boutonShutdownClique() {
-    const { id, address } = lireCodeEtAdresseDepuisPage();
-    if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
-    msg(`Extinction du décodeur ${address}`, "warning");
-    try {
-        const res = await shutdownDecoder(id, address);
-        msg(res, "success");
-        const info = await getDecoderInfo(id, address);
-        msg(info, "success");
-        majEtatDepuisInfo(info, address);
-    } catch (e) {
-        msg("Erreur shutdown: " + e.message, "error");
-    }
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
     msg(`Extinction du décodeur ${address}`, "warning");
@@ -338,35 +246,7 @@ function msg(texte, type = "info") {
     const now = new Date();
     const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}/${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}/`;
     const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
-    const cont = document.getElementById("messages-content");
-    const now = new Date();
-    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}/${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}/`;
-    const contenu = typeof texte === "string" ? texte : JSON.stringify(texte);
 
-    // Définir la couleur selon le type
-    let color;
-    switch (type) {
-        // Les types possibles sont : success, error, warning, debug, info
-        // Cas Vert : succès de l'action
-        case "success":
-            color = "green";
-            break;
-        // Cas Rouge : erreur lors de l'action
-        case "error":
-            color = "red";
-            break;
-        // Cas Orange : action en cours ou avertissement
-        case "warning":
-            color = "orange";
-            break;
-        // Cas Bleu : messages de debug ou d'information détaillée
-        case "debug":
-            color = "blue";
-            break;
-        // Cas Noir : messages d'information généraux ou autres
-        default:
-            color = "black"; // info ou autres
-    }
     // Définir la couleur selon le type
     let color;
     switch (type) {
@@ -395,12 +275,7 @@ function msg(texte, type = "info") {
     const ligne = document.createElement("p");
     ligne.textContent = `${ts} ${contenu}`;
     ligne.style.color = color;
-    const ligne = document.createElement("p");
-    ligne.textContent = `${ts} ${contenu}`;
-    ligne.style.color = color;
 
-    if (cont) cont.appendChild(ligne);
-    else console.log(`${ts} ${contenu}`);
     if (cont) cont.appendChild(ligne);
     else console.log(`${ts} ${contenu}`);
 }
@@ -421,8 +296,6 @@ function validateEmailAlreadyExists(email) {
     return fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`)
         .then((res) => res.json())
         .then((data) => data.exists)
-        .then((res) => res.json())
-        .then((data) => data.exists)
         .catch(() => false);
 }
 
@@ -437,7 +310,6 @@ function hachageMotDePasse(motDePasse) {
     for (let i = 0; i < motDePasse.length; i++) {
         const char = motDePasse.charCodeAt(i);
         hash = (hash << 5) - hash + char;
-        hash = (hash << 5) - hash + char;
         hash |= 0; // Convert to 32bit integer
     }
     return hash.toString();
@@ -445,7 +317,6 @@ function hachageMotDePasse(motDePasse) {
 
 // Fonction d'inscription
 async function signup() {
-    // Récupération des valeurs des champs et validation
     // Récupération des valeurs des champs et validation
     const nom = document.getElementById("nom")?.value.trim();
     const email = document.getElementById("email")?.value.trim();
@@ -487,7 +358,6 @@ async function signup() {
         messageEl.className = "error";
         return;
     }
-    }
     // Hachage du mot de passe avant l'envoi
     const hashedPwd = hachageMotDePasse(motDePasse);
     // Envoi de la requête d'inscription au serveur
@@ -495,7 +365,6 @@ async function signup() {
         const res = await fetch(`${API_URL}/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nom, email, motDePasse: hashedPwd }),
             body: JSON.stringify({ nom, email, motDePasse: hashedPwd }),
         });
         const data = await res.json();
@@ -509,14 +378,12 @@ async function signup() {
         messageEl.textContent = "Inscription réussie, redirection...";
         messageEl.className = "success";
         setTimeout(() => (window.location.href = "/pages/dashboard.html"), 1000);
-        setTimeout(() => (window.location.href = "/pages/dashboard.html"), 1000);
     } catch (err) {
         messageEl.textContent = "Erreur serveur";
         messageEl.className = "error";
     }
 }
 
-// Login
 // Login
 async function signin() {
     const email = document.getElementById("email")?.value.trim();
@@ -540,7 +407,6 @@ async function signin() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, motDePasse: hashedPwd }),
-            body: JSON.stringify({ email, motDePasse: hashedPwd }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -552,7 +418,6 @@ async function signin() {
         setUser(data.user);
         messageEl.textContent = "Connexion réussie, redirection...";
         messageEl.className = "success";
-        setTimeout(() => (window.location.href = "/pages/dashboard.html"), 1000);
         setTimeout(() => (window.location.href = "/pages/dashboard.html"), 1000);
     } catch (err) {
         messageEl.textContent = "Erreur serveur";
@@ -602,11 +467,11 @@ function createClientLine(client) {
     const line = document.createElement("div");
     line.className = "client-line";
 
-		const buttonEdit = document.createElement("button");
-		buttonEdit.textContent = "Modifier";
-		buttonEdit.onclick = () => editClient(client.id);
+    const buttonEdit = document.createElement("button");
+    buttonEdit.textContent = "Modifier";
+    buttonEdit.onclick = () => editClient(client.id);
 
-		const buttonDelete = document.createElement("button");
+    const buttonDelete = document.createElement("button");
     buttonDelete.textContent = "Supprimer";
     buttonDelete.onclick = () => deleteClient(client.id);
 
@@ -620,19 +485,19 @@ function createClientLine(client) {
 async function deleteClient(id) {
     try {
         const messageEl = document.getElementById("admin-message");
-				const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce client ?");
-				if (!confirmation) return;
-				const res = await fetch(`${API_URL}/clients/${id}`, {
-						method: "DELETE",
-						headers: { "Content-Type": "application/json" },
-				});
-				const data = await res.json();
+        const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce client ?");
+        if (!confirmation) return;
+        const res = await fetch(`${API_URL}/clients/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
         if (!res.ok) {
             messageEl.textContent = data.message || "Erreur serveur";
             messageEl.className = "error";
             return;
         }
-				messageEl.textContent = "Client supprimé avec succès";
+        messageEl.textContent = "Client supprimé avec succès";
         messageEl.className = "success";
     } catch (error) {
         messageEl.textContent = "Erreur serveur";
@@ -644,15 +509,11 @@ async function deleteClient(id) {
 async function editClient(id) {}
 
 // ==========================
-// Dashboard / UI 
+// Dashboard / UI
 // ==========================
 
 // Affiche "Connecté en tant que ..." dans le header du dashboard
 function displayUserInfo() {
-    const user = getUser();
-    const el = document.getElementById("user-info");
-    if (!el) return;
-    el.innerHTML = user ? `Connecté en tant que <strong>${user.nom}</strong>` : "Non connecté";
     const user = getUser();
     const el = document.getElementById("user-info");
     if (!el) return;
@@ -686,16 +547,15 @@ async function displayUserSummary() {
                 } catch {
                     return null;
                 }
-            })
+            }),
         );
 
         const total = decoders.length;
-        const actifs = infoList.filter(
-            (info) => info && info.state && ["actif", "active"].includes(String(info.state).toLowerCase())
-        ).length;
+        const actifs = infoList.filter((info) => info && info.state && ["actif", "active"].includes(String(info.state).toLowerCase())).length;
         const inactifs = total - actifs;
 
-        el.innerHTML = `Connecté en tant que <strong>${user.nom}</strong><br>` +
+        el.innerHTML =
+            `Connecté en tant que <strong>${user.nom}</strong><br>` +
             `<small>${total} décodeur${total > 1 ? "s" : ""} associé${total > 1 ? "s" : ""} — ` +
             `${actifs} actif${actifs > 1 ? "s" : ""}, ${inactifs} inactif${inactifs > 1 ? "s" : ""}</small>`;
     } catch (e) {
@@ -718,7 +578,7 @@ async function displayUserDecoders() {
     }
 
     try {
-    // 1) Récupérer les utilisateurs depuis le backend (users.json)
+        // 1) Récupérer les utilisateurs depuis le backend (users.json)
         const res = await fetch(`${API_URL}/users`);
         const users = await res.json();
 
@@ -784,7 +644,7 @@ async function displayUserDecoders() {
                         window.location.href = `/pages/decodeur.html?${params.toString()}`;
                     };
 
-                    // Plus de boutons 
+                    // Plus de boutons
                     const btnReset = null;
                     const btnReinit = null;
                     const btnShutdown = null;
@@ -797,7 +657,7 @@ async function displayUserDecoders() {
                                 btnReset.disabled = true;
                                 btnReset.classList.add("btn-reset-disabled");
 
-                                // met a jour le statut visuel 
+                                // met a jour le statut visuel
                                 const statusTextEl = card.querySelector(".decoder-status-text");
                                 if (statusTextEl) {
                                     statusTextEl.innerHTML = `<strong>Statut :</strong> Reset en cours`;
@@ -916,18 +776,10 @@ function displayNav() {
     const user = getUser();
     const adminLink = document.getElementById("nav-admin-link");
     if (adminLink) adminLink.style.display = user && user.role === "admin" ? "inline" : "none";
-    const user = getUser();
-    const adminLink = document.getElementById("nav-admin-link");
-    if (adminLink) adminLink.style.display = user && user.role === "admin" ? "inline" : "none";
 }
 
 // Mise en surbrillance du lien actif dans la nav
 function highlightActiveLink() {
-    const links = document.querySelectorAll(".nav-links a");
-    const currentPath = window.location.pathname.split("/").pop();
-    links.forEach((link) => {
-        link.classList.toggle("active", link.getAttribute("href") === currentPath);
-    });
     const links = document.querySelectorAll(".nav-links a");
     const currentPath = window.location.pathname.split("/").pop();
     links.forEach((link) => {
@@ -939,7 +791,7 @@ function highlightActiveLink() {
 // Initialisation DOM (tous les écrans)
 // ==========================
 
-// Branche tous les listenenrs sur les boutons 
+// Branche tous les listenenrs sur les boutons
 function initialiserUI() {
     const btnAfficher = document.getElementById("btn-afficher-decodeur");
     const btnRefreshDecoders = document.getElementById("btn-refresh-decoders");
@@ -958,7 +810,7 @@ function initialiserUI() {
     if (btnReinit) btnReinit.addEventListener("click", boutonReinitClique);
     if (btnShutdown) btnShutdown.addEventListener("click", boutonShutdownClique);
 
-    // Initialisation de la sélection par utilisateur 
+    // Initialisation de la sélection par utilisateur
     if (selectUserAdmin && selectUserDecoder) {
         initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDecoder);
     }
@@ -1029,7 +881,7 @@ function chargerDecodeurDepuisSelectionUser() {
     boutonAfficherClique();
 }
 
-// Initialisation au chargement de la page 
+// Initialisation au chargement de la page
 document.addEventListener("DOMContentLoaded", async () => {
     initialiserUI();
     displayUserInfo();
@@ -1050,4 +902,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Exposition des fonctions API pour les boutons de la page
 window.DecodeurAPI = { getDecoderInfo, resetDecoder, reinitDecoder, shutdownDecoder, getAllDecodersInfo, signin, signup, logout };
-
