@@ -481,6 +481,9 @@ function createClientLine(client) {
     return line;
 }
 
+//Création d'un client
+function createClient() {}
+
 //Suppresion d'un client
 async function deleteClient(id) {
     try {

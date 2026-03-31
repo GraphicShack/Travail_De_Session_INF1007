@@ -413,3 +413,14 @@ fieldset legend {
     background-color: red;
     margin-right: 0;
 }
+
+/* Bouton pour ajouter un client dans la page admin */
+.admin-subtitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#btn-ajouter-utilisateur {
+    background-color: #43a047;
+}
