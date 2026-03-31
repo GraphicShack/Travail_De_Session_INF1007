@@ -66,7 +66,7 @@ app.post("/api/login", (req, res) => {
       nom: userData.nom,
       email: userData.email,
       role: userData.role,
-      codePermanent: userData.codePermanent || null,
+      codePermanent: userData.codePermanent,
       decodeurs: userData.decodeurs || [],
       chaines: userData.Chaines || userData.chaines || []
     };
@@ -87,9 +87,9 @@ app.post("/api/login", (req, res) => {
 // SIGNUP
 app.post("/api/signup", (req, res) => {
   try {
-    const { nom, email, motDePasse } = req.body;
+    const { nom, email, motDePasse, codePermanent } = req.body;
 
-    if (!nom || !email || !motDePasse) {
+    if (!nom || !email || !motDePasse || !codePermanent) {
       return res.status(400).json({
         message: "Champs manquants"
       });
@@ -110,6 +110,7 @@ app.post("/api/signup", (req, res) => {
       nom,
       email,
       motDePasse,
+      codePermanent,
       role: "user"
     };
 
@@ -123,6 +124,7 @@ app.post("/api/signup", (req, res) => {
         id: newUser.id,
         nom: newUser.nom,
         email: newUser.email,
+        codePermanent: newUser.codePermanent,
         role: newUser.role
       }
     });
@@ -187,6 +189,7 @@ app.get("/api/clients", async (req, res) => {
 			id: u.id,
 			nom: u.nom,
 			email: u.email,
+      codePermanent: u.codePermanent,
 			decodeurs: u.decodeurs || []
 		}));
 

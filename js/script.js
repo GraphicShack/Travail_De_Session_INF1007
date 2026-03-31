@@ -320,6 +320,7 @@ async function signup() {
     // Récupération des valeurs des champs et validation
     const nom = document.getElementById("nom")?.value.trim();
     const email = document.getElementById("email")?.value.trim();
+    const codePermanent = document.getElementById("code-permanent")?.value.trim();
     const motDePasse = document.getElementById("motdepasse")?.value.trim();
     const confirmPwd = document.getElementById("confirm-motdepasse")?.value.trim();
     const messageEl = document.getElementById("signup-message");
@@ -337,6 +338,12 @@ async function signup() {
     // Validation de l'email
     if (!validateEmail(email)) {
         messageEl.textContent = "Email invalide";
+        messageEl.className = "error";
+        return;
+    }
+    // Validation du code permanent (format AAAA00000000)
+    if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
+        messageEl.textContent = "Code permanent invalide (format AAAA00000000)";
         messageEl.className = "error";
         return;
     }
@@ -365,7 +372,7 @@ async function signup() {
         const res = await fetch(`${API_URL}/signup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nom, email, motDePasse: hashedPwd }),
+            body: JSON.stringify({ nom, email, motDePasse: hashedPwd, codePermanent }),
         });
         const data = await res.json();
         if (!res.ok) {
