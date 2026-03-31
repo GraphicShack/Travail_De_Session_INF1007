@@ -487,7 +487,7 @@ async function deleteClient(id) {
         const messageEl = document.getElementById("admin-message");
         const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce client ?");
         if (!confirmation) return;
-        const res = await fetch(`${API_URL}/clients/${id}`, {
+        const res = await fetch(`${API_URL}/users/${id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
         });
