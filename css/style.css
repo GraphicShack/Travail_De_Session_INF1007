@@ -116,7 +116,10 @@ nav {
     border-radius: 6px;
     padding: 12px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
 }
 
 .decoder-card:hover {
@@ -398,4 +401,15 @@ fieldset legend {
 .nav-links a.active {
     background-color: #696766; /* couleur du lien actif */
     border-radius: 5px;
+}
+
+/* Ligne client */
+.client-line button {
+    margin-top: 5px;
+    margin-right: 10px;
+}
+
+.client-line button:last-child {
+    background-color: red;
+    margin-right: 0;
 }

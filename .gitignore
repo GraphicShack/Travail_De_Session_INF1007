@@ -20,7 +20,9 @@ build/
 Thumbs.db
 
 # vscode
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # coverage
 coverage/

@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // API Décodeur : appels via backend (vérifier si notre server node run avant)
 // ==========================
 
-// Validation de l'adresse IP du décodeur 
+// Validation de l'adresse IP du décodeur
 function isValidDecoderIp(ip) {
     return DECODER_ADDRESSES.includes(ip);
 }
@@ -82,7 +82,7 @@ async function decoderRequest(id, address, action) {
     const text = await response.text();
     if (!response.ok) throw new Error(`Erreur HTTP ${response.status} - ${text}`);
 
-    // Parsing
+    // Parsing de la réponse JSON et gestion des erreurs métier
     let data;
     try {
         data = JSON.parse(text);
@@ -95,7 +95,7 @@ async function decoderRequest(id, address, action) {
     return data;
 }
 
-// Fonctions spécifiques pour actions
+// Fonctions spécifiques pour chaque action (qui appellent la fonction générique)
 async function getDecoderInfo(id, address) {
     return decoderRequest(id, address, "info");
 }
@@ -123,7 +123,7 @@ async function getAllDecodersInfo(id) {
 }
 
 // ==========================
-// Fonctions d'interface 
+// Fonctions d'interface
 // ==========================
 function majEtatDepuisInfo(info, adresse) {
     const zone = document.getElementById("etat-content");
@@ -149,9 +149,9 @@ function lireCodeEtAdresseDepuisPage() {
 }
 
 // ==========================
-// Boutons page Décodeurs 
+// Boutons page Décodeurs
 // ==========================
-// Bouton "Afficher" 
+// Bouton "Afficher"
 async function boutonAfficherClique() {
     const { id, address } = lireCodeEtAdresseDepuisPage();
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
@@ -171,7 +171,7 @@ async function boutonResetClique() {
     if (!id || !address) return msg("Code permanent ou adresse manquant", "error");
     msg(`Reset du décodeur ${address}`, "warning");
     try {
-        // Afficher les infos dans la page 
+        // Afficher les infos dans la page
         try {
             const info = await getDecoderInfo(id, address);
             msg(info, "success");
@@ -439,15 +439,18 @@ async function signin() {
 // Affichage des clients
 async function displayClients() {
     const div = document.getElementById("listeUtilisateurs");
+    const messageEl = document.getElementById("admin-message");
     if (!div) return;
     try {
         const clients = await getClients();
-				for (const client of clients) {
-					div.append(createClientLine(client));
-					div.append(document.createElement("hr"));
-				}
+        for (const client of clients) {
+            div.append(createClientLine(client));
+            div.append(document.createElement("hr"));
+        }
     } catch (error) {
         console.error("Erreur lors de l'affichage des clients:", error);
+        messageEl.textContent = "Erreur serveur";
+        messageEl.className = "error";
     }
 }
 
@@ -466,15 +469,54 @@ async function getClients() {
     }
 }
 
-//Affichage des données d'un client 
+//Affichage des données d'un client
 function createClientLine(client) {
-	const line = document.createElement("div");
-	line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div>`;
-	return line;
+    const line = document.createElement("div");
+    line.className = "client-line";
+
+    const buttonEdit = document.createElement("button");
+    buttonEdit.textContent = "Modifier";
+    buttonEdit.onclick = () => editClient(client.id);
+
+    const buttonDelete = document.createElement("button");
+    buttonDelete.textContent = "Supprimer";
+    buttonDelete.onclick = () => deleteClient(client.id);
+
+    line.innerHTML = `<div>ID: ${client.id}</div><div>Nom: ${client.nom}</div><div>Email: ${client.email}</div>`;
+    line.appendChild(buttonEdit);
+    line.appendChild(buttonDelete);
+    return line;
 }
 
+//Suppresion d'un client
+async function deleteClient(id) {
+    try {
+        const messageEl = document.getElementById("admin-message");
+        const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce client ?");
+        if (!confirmation) return;
+        const res = await fetch(`${API_URL}/users/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            messageEl.textContent = data.message || "Erreur serveur";
+            messageEl.className = "error";
+            return;
+        }
+        messageEl.textContent = "Client supprimé avec succès";
+        messageEl.className = "success";
+    } catch (error) {
+        messageEl.textContent = "Erreur serveur";
+        messageEl.className = "error";
+    }
+}
+
+//Modification d'un client
+async function editClient(id) {}
+
 // ==========================
-// Dashboard / UI 
+// Dashboard / UI
 // ==========================
 
 // Affiche "Connecté en tant que ..." dans le header du dashboard
@@ -512,16 +554,15 @@ async function displayUserSummary() {
                 } catch {
                     return null;
                 }
-            })
+            }),
         );
 
         const total = decoders.length;
-        const actifs = infoList.filter(
-            (info) => info && info.state && ["actif", "active"].includes(String(info.state).toLowerCase())
-        ).length;
+        const actifs = infoList.filter((info) => info && info.state && ["actif", "active"].includes(String(info.state).toLowerCase())).length;
         const inactifs = total - actifs;
 
-        el.innerHTML = `Connecté en tant que <strong>${user.nom}</strong><br>` +
+        el.innerHTML =
+            `Connecté en tant que <strong>${user.nom}</strong><br>` +
             `<small>${total} décodeur${total > 1 ? "s" : ""} associé${total > 1 ? "s" : ""} — ` +
             `${actifs} actif${actifs > 1 ? "s" : ""}, ${inactifs} inactif${inactifs > 1 ? "s" : ""}</small>`;
     } catch (e) {
@@ -544,7 +585,7 @@ async function displayUserDecoders() {
     }
 
     try {
-    // 1) Récupérer les utilisateurs depuis le backend (users.json)
+        // 1) Récupérer les utilisateurs depuis le backend (users.json)
         const res = await fetch(`${API_URL}/users`);
         const users = await res.json();
 
@@ -610,7 +651,7 @@ async function displayUserDecoders() {
                         window.location.href = `/pages/decodeur.html?${params.toString()}`;
                     };
 
-                    // Plus de boutons 
+                    // Plus de boutons
                     const btnReset = null;
                     const btnReinit = null;
                     const btnShutdown = null;
@@ -623,7 +664,7 @@ async function displayUserDecoders() {
                                 btnReset.disabled = true;
                                 btnReset.classList.add("btn-reset-disabled");
 
-                                // met a jour le statut visuel 
+                                // met a jour le statut visuel
                                 const statusTextEl = card.querySelector(".decoder-status-text");
                                 if (statusTextEl) {
                                     statusTextEl.innerHTML = `<strong>Statut :</strong> Reset en cours`;
@@ -757,7 +798,7 @@ function highlightActiveLink() {
 // Initialisation DOM (tous les écrans)
 // ==========================
 
-// Branche tous les listenenrs sur les boutons 
+// Branche tous les listenenrs sur les boutons
 function initialiserUI() {
     const btnAfficher = document.getElementById("btn-afficher-decodeur");
     const btnRefreshDecoders = document.getElementById("btn-refresh-decoders");
@@ -776,7 +817,7 @@ function initialiserUI() {
     if (btnReinit) btnReinit.addEventListener("click", boutonReinitClique);
     if (btnShutdown) btnShutdown.addEventListener("click", boutonShutdownClique);
 
-    // Initialisation de la sélection par utilisateur 
+    // Initialisation de la sélection par utilisateur
     if (selectUserAdmin && selectUserDecoder) {
         initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDecoder);
     }
@@ -847,7 +888,7 @@ function chargerDecodeurDepuisSelectionUser() {
     boutonAfficherClique();
 }
 
-// Initialisation au chargement de la page 
+// Initialisation au chargement de la page
 document.addEventListener("DOMContentLoaded", async () => {
     initialiserUI();
     displayUserInfo();
