@@ -197,6 +197,27 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
+// GET A CLIENT
+app.get('/api/client/:id', (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const users = getUsers();
+    const user = users.find((u) => u.id === userId && u.role === 'user');
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Client non trouvé',
+      });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erreur serveur',
+    });
+  }
+});
+
 // DELETE A USER
 app.delete('/api/users/:id', (req, res) => {
   try {
