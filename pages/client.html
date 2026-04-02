@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <title>Administration</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>INF1007 — Décodeur</title>
     <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
@@ -22,19 +23,12 @@
       </div>
     </nav>
     <div class="container">
-      <h1>Administration</h1>
-      <div class="admin-subtitle">
-        <h2>Liste des clients</h2>
-        <button id="btn-ajouter-utilisateur" onclick="createClient()">Ajouter un client</button>
-      </div>
-      <div id="listeUtilisateurs"></div>
-      <div id="admin-message"></div>
-      <a href="dashboard.html">Retour dashboard</a>
+      <h1>Informations sur le client</h1>
+      <p><strong> Nom :</strong> <span id="client-name"></span></p>
     </div>
     <div class="footer">
       <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
-
-    <script type="module" src="../js/script.js"></script>
+    <script src="../js/script.js"></script>
   </body>
 </html>
