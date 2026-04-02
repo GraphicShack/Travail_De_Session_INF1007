@@ -475,8 +475,8 @@ function createClientLine(client) {
     line.className = "client-line";
 
     const buttonEdit = document.createElement("button");
-    buttonEdit.textContent = "Modifier";
-    buttonEdit.onclick = () => editClient(client.id);
+    buttonEdit.textContent = "Voir";
+    buttonEdit.onclick = () => (window.location.href = '/pages/client.html?id=' + client.id);
 
     const buttonDelete = document.createElement("button");
     buttonDelete.textContent = "Supprimer";
