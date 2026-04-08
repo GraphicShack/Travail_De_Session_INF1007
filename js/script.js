@@ -489,7 +489,9 @@ function createClientLine(client) {
 }
 
 //Création d'un client
-function createClient() {}
+function createClient() {
+  window.alert("Bonjour ! Cette fonctionnalité n'est pas encore implémentée. Veuillez contacter l'administrateur.");
+}
 
 //Suppresion d'un client
 async function deleteClient(id) {
