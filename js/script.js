@@ -634,6 +634,40 @@ async function switchDisplay(modeAjout) {
   }
 }
 
+// Association d'un décodeur un client
+async function assignDecoderToClient(codePermanent, address) {
+  try {
+    const res = await fetch(`${API_URL}/users/assign-decoder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur lors de l'assignation");
+    return data;
+  } catch (error) {
+    console.error("Erreur lors de l'assignation du décodeur:", error);
+    throw error;
+  }
+}
+
+// Dissociation d'un décodeur d'un client
+async function unassignDecoderFromClient(codePermanent, address) {
+  try {
+    const res = await fetch(`${API_URL}/users/unassign-decoder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur lors de la dissociation');
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la dissociation du décodeur:', error);
+    throw error;
+  }
+}
+
 /*function fillSelectDecoder() {
   const select = document.getElementById('select-decoder-to-assign');
   if (!select) return;
