@@ -235,16 +235,11 @@ app.delete('/api/users/:id', (req, res) => {
     });
   }
 });
-
-// Assignation des décodeurs
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
 app.post('/api/users/assign-decoder', (req, res) => {
   const { codePermanent, address } = req.body;
 
   try {
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    let users = JSON.parse(data);
+    let users = getUsers();
 
     const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
     if (userIndex === -1) {
@@ -263,7 +258,7 @@ app.post('/api/users/assign-decoder', (req, res) => {
     }
     users[userIndex].decodeurs.push(address);
 
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
 
     res.status(200).json({ message: 'Décodeur assigné avec succès' });
   } catch (error) {
@@ -272,13 +267,11 @@ app.post('/api/users/assign-decoder', (req, res) => {
   }
 });
 
-// Dissociation des décodeurs
 app.post('/api/users/unassign-decoder', (req, res) => {
   const { codePermanent, address } = req.body;
 
   try {
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    let users = JSON.parse(data);
+    let users = getUsers();
 
     const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
     if (userIndex === -1) {
@@ -289,20 +282,18 @@ app.post('/api/users/unassign-decoder', (req, res) => {
       users[userIndex].decodeurs = users[userIndex].decodeurs.filter((a) => a !== address);
     }
 
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
 
-    res.status(200).json({ message: 'Décodeur dissocié avec succès' });
+    res.status(200).json({ message: 'Décodeur dissocié avec succès !' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Erreur serveur lors de la dissociation' });
+    res.status(500).json({ message: 'Erreur serveur lors de la dissociation.' });
   }
 });
 
 // 404 HANDLER
 app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route introuvable',
-  });
+  res.status(404).json({ message: 'Route introuvable' });
 });
 
 // Lancer le serveur

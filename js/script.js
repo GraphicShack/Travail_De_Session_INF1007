@@ -634,8 +634,7 @@ async function displayClientInfo() {
     `<p><strong>ID :</strong> ${user.id}</p>` +
     `<p><strong>Nom :</strong> ${user.nom}</p>` +
     `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
-    `<p><strong>Email :</strong> ${user.email}</p>` +
-    `<p><strong>Décodeurs associés :</strong> ${user.decodeurs?.join(', ') || 'Aucun'}</p>`;
+    `<p><strong>Email :</strong> ${user.email}</p>`;
 }
 
 // Affichage des détails d'un client pour la page client.html
@@ -706,6 +705,7 @@ async function displayClientDecoders() {
       container.innerHTML = `
         <div class="client-card">
           <div class="client-decoders">
+            <br />
             <h2>Décodeurs associés :</h2>
             ${decoderList}
           </div>
@@ -1273,23 +1273,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
-
-// Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', async () => {
-  initialiserUI();
-  displayUserInfo();
-  await displayUserSummary();
-  displayUserDecoders();
-  displayNav();
-  highlightActiveLink();
-  await displayClients();
-
-  // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard
-  const currentPath = window.location.pathname.split('/').pop();
-  if (currentPath === 'dashboard.html') {
-    setInterval(() => {
-      displayUserDecoders();
-    }, 30000); // 30 000 ms = 30 secondes
   }
 });
 
