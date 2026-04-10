@@ -121,8 +121,8 @@ app.post('/api/signup', (req, res) => {
         nom: newUser.nom,
         email: newUser.email,
         codePermanent: newUser.codePermanent,
-        role: newUser.role
-      }
+        role: newUser.role,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -235,12 +235,65 @@ app.delete('/api/users/:id', (req, res) => {
     });
   }
 });
+app.post('/api/users/assign-decoder', (req, res) => {
+  const { codePermanent, address } = req.body;
+
+  try {
+    let users = getUsers();
+
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    const isAlreadyAssigned = users.some((u) => u.decodeurs && u.decodeurs.includes(address));
+    if (isAlreadyAssigned) {
+      return res
+        .status(400)
+        .json({ message: 'Ce décodeur est déjà assigné à un autre utilisateur' });
+    }
+
+    if (!users[userIndex].decodeurs) {
+      users[userIndex].decodeurs = [];
+    }
+    users[userIndex].decodeurs.push(address);
+
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+
+    res.status(200).json({ message: 'Décodeur assigné avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur lors de l'assignation" });
+  }
+});
+
+app.post('/api/users/unassign-decoder', (req, res) => {
+  const { codePermanent, address } = req.body;
+
+  try {
+    let users = getUsers();
+
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    if (users[userIndex].decodeurs) {
+      users[userIndex].decodeurs = users[userIndex].decodeurs.filter((a) => a !== address);
+    }
+
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+
+    res.status(200).json({ message: 'Décodeur dissocié avec succès !' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur serveur lors de la dissociation.' });
+  }
+});
 
 // 404 HANDLER
 app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route introuvable',
-  });
+  res.status(404).json({ message: 'Route introuvable' });
 });
 
 // Lancer le serveur
