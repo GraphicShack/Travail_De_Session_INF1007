@@ -24,7 +24,8 @@
     </nav>
     <div class="container">
       <h1>Informations sur le client</h1>
-      <div id="client-info"></div>
+      <div id="client-detailed-infos"></div>
+      <div id="client-page-message"></div>
 
       <div id="section-liste-decodeurs">
         <div id="liste-decodeurs"></div>
@@ -44,5 +45,10 @@
       <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
     <script src="../js/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        await displayClientInfo();
+      });
+    </script>
   </body>
 </html>

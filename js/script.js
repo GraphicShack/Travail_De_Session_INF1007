@@ -492,7 +492,84 @@ function createClientLine(client) {
 }
 
 //Création d'un client
-function createClient() {}
+async function createClient() {
+  // Récupération des valeurs des champs et validation
+  const nom = document.getElementById('client-name')?.value.trim();
+  const email = document.getElementById('client-email')?.value.trim();
+  const codePermanent = document.getElementById('client-code')?.value.trim();
+  const motDePasse = document.getElementById('client-password')?.value.trim();
+  const confirmPwd = document.getElementById('client-confirm-password')?.value.trim();
+  const messageEl = document.getElementById('client-creation-message');
+
+  // Réinitialisation du message d'erreur
+  messageEl.textContent = '';
+  messageEl.className = '';
+
+  // Validation des champs
+  if (!nom || !email || !codePermanent || !motDePasse || !confirmPwd) {
+    messageEl.textContent = 'Veuillez remplir tous les champs';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation de l'email
+  if (!validateEmail(email)) {
+    messageEl.textContent = 'Email invalide';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation du code permanent (format AAAA00000000)
+  if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
+    messageEl.textContent = 'Code permanent invalide (format AAAA00000000)';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Vérification si l'email existe déjà
+  if (await validateEmailAlreadyExists(email)) {
+    messageEl.textContent = 'Email déjà utilisé';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation du mot de passe
+  if (!validatePassword(motDePasse)) {
+    messageEl.textContent = 'Mot de passe doit avoir au moins 8 caractères et une majuscule';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation de la confirmation du mot de passe
+  if (motDePasse !== confirmPwd) {
+    messageEl.textContent = 'Les mots de passe ne correspondent pas';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Hachage du mot de passe avant l'envoi
+  const hashedPwd = hachageMotDePasse(motDePasse);
+
+  // Envoi de la requête d'inscription au serveur
+  try {
+    const res = await fetch(`${API_URL}/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, email, motDePasse: hashedPwd, codePermanent }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      messageEl.textContent = data.message || 'Erreur serveur';
+      messageEl.className = 'error';
+      return;
+    }
+    messageEl.textContent = 'Client créé avec succès';
+    messageEl.className = 'success';
+  } catch (err) {
+    messageEl.textContent = 'Erreur serveur';
+    messageEl.className = 'error';
+  }
+}
 
 //Suppresion d'un client
 async function deleteClient(id) {
@@ -518,8 +595,48 @@ async function deleteClient(id) {
   }
 }
 
-//Modification d'un client
-async function editClient(id) {}
+// ==========================
+// Page client
+// ==========================
+
+async function getClient(id) {
+  try {
+    const messageEl = document.getElementById('client-page-message');
+    const res = await fetch(`${API_URL}/client/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      messageEl.textContent = data.message || 'Erreur serveur';
+      messageEl.className = 'error';
+      return;
+    }
+    return data || null;
+  } catch (error) {
+    messageEl.textContent = 'Erreur serveur';
+    messageEl.className = 'error';
+  }
+}
+
+async function displayClientInfo() {
+  const messageEl = document.getElementById('client-page-message');
+  const container = document.getElementById('client-detailed-infos');
+  const params = new URLSearchParams(window.location.search);
+  const userId = parseInt(params.get('id').trim());
+  const user = await getClient(userId);
+  if (!user) {
+    messageEl.textContent = 'Client non trouvé';
+    messageEl.className = 'error';
+    return;
+  }
+  container.innerHTML =
+    `<p><strong>ID :</strong> ${user.id}</p>` +
+    `<p><strong>Nom :</strong> ${user.nom}</p>` +
+    `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
+    `<p><strong>Email :</strong> ${user.email}</p>` +
+    `<p><strong>Décodeurs associés :</strong> ${user.decodeurs?.join(', ') || 'Aucun'}</p>`;
+}
 
 // Affichage des détails d'un client pour la page client.html
 async function showClientDetails() {
@@ -1156,6 +1273,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', async () => {
+  initialiserUI();
+  displayUserInfo();
+  await displayUserSummary();
+  displayUserDecoders();
+  displayNav();
+  highlightActiveLink();
+  await displayClients();
+
+  // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard
+  const currentPath = window.location.pathname.split('/').pop();
+  if (currentPath === 'dashboard.html') {
+    setInterval(() => {
+      displayUserDecoders();
+    }, 30000); // 30 000 ms = 30 secondes
   }
 });
 
