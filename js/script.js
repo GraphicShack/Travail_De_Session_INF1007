@@ -597,17 +597,23 @@ async function displayClientDecoders() {
       `;
 
       container.querySelectorAll('.btn-unassign-decoder').forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
           const address = button.dataset.address;
           if (!client.codePermanent || !address) {
             console.error('Code permanent ou adresse de décodeur manquante.');
             return;
           }
-          const params = new URLSearchParams({
-            codePermanent: client.codePermanent,
-            address,
-          });
-          window.location.href = `/pages/decodeur.html?${params.toString()}`;
+          // Action du bouton de la dissociation
+          const confirmation = confirm(
+            `Êtes-vous sûr de vouloir dissocier le décodeurs ${address} ?`
+          );
+          if (!confirmation) return;
+          try {
+            await unassignDecoderFromClient(client.codePermanent, address);
+            alert(`Décodeur ${address} dissocié avec succès.`);
+          } catch (error) {
+            alert('Erreur: ' + error.message);
+          }
         });
       });
       console.log('Données du client chargées avec succès :', client);
@@ -668,20 +674,6 @@ async function unassignDecoderFromClient(codePermanent, address) {
   }
 }
 
-/*function fillSelectDecoder() {
-  const select = document.getElementById('select-decoder-to-assign');
-  if (!select) return;
-
-  select.innerHTML = '<option value="">Sélectionnez un décodeur</option>';
-
-  DECODER_ADDRESSES.forEach((address) => {
-    const option = document.createElement('option');
-    option.value = address;
-    option.textContent = address;
-    select.appendChild(option);
-  });
-}*/
-
 // Remplissage dynamique de la liste des décodeurs disponible à l'assignation
 async function fillSelectDecoder() {
   const select = document.getElementById('select-decoder-to-assign');
@@ -699,6 +691,7 @@ async function fillSelectDecoder() {
       if (user.decodeurs) {
         user.decodeurs.forEach((address) => {
           assignments[address] = user.nom;
+          assignments[user] = user.id;
         });
       }
     });
@@ -1132,6 +1125,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnCancel = document.getElementById('btn-cancel-assignation');
     if (btnCancel) {
       btnCancel.addEventListener('click', () => switchDisplay(false));
+    }
+
+    const btnConfirm = document.getElementById('btn-confirm-assignation');
+    if (btnConfirm) {
+      btnConfirm.addEventListener('click', async () => {
+        const select = document.getElementById('select-decoder-to-assign');
+        const address = select.value;
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id');
+
+        if (!address) {
+          alert('Sélectionnez un décodeur à assigner');
+          return;
+        }
+
+        try {
+          const resUser = await fetch(`${API_URL}/users`);
+          const users = await resUser.json();
+          const client = users.find((u) => String(u.id) === String(clientId));
+          if (!client || !client.codePermanent) {
+            throw new Error('Client ou code permanent introuvable');
+          }
+
+          await assignDecoderToClient(client.codePermanent, address);
+          alert('Décodeur assigné avec succès');
+          window.location.reload();
+        } catch (error) {
+          alert(error.message || "Erreur lors de l'assignation du décodeur");
+        }
+      });
     }
   }
 });

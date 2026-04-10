@@ -121,8 +121,8 @@ app.post('/api/signup', (req, res) => {
         nom: newUser.nom,
         email: newUser.email,
         codePermanent: newUser.codePermanent,
-        role: newUser.role
-      }
+        role: newUser.role,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -197,6 +197,27 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
+// GET A CLIENT
+app.get('/api/client/:id', (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const users = getUsers();
+    const user = users.find((u) => u.id === userId && u.role === 'user');
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Client non trouvé',
+      });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erreur serveur',
+    });
+  }
+});
+
 // DELETE A USER
 app.delete('/api/users/:id', (req, res) => {
   try {
@@ -212,6 +233,68 @@ app.delete('/api/users/:id', (req, res) => {
     res.status(500).json({
       message: 'Erreur serveur',
     });
+  }
+});
+
+// Assignation des décodeurs
+const USERS_FILE = path.join(__dirname, '../data/users.json');
+
+app.post('/api/users/assign-decoder', (req, res) => {
+  const { codePermanent, address } = req.body;
+
+  try {
+    const data = fs.readFileSync(USERS_FILE, 'utf8');
+    let users = JSON.parse(data);
+
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    const isAlreadyAssigned = users.some((u) => u.decodeurs && u.decodeurs.includes(address));
+    if (isAlreadyAssigned) {
+      return res
+        .status(400)
+        .json({ message: 'Ce décodeur est déjà assigné à un autre utilisateur' });
+    }
+
+    if (!users[userIndex].decodeurs) {
+      users[userIndex].decodeurs = [];
+    }
+    users[userIndex].decodeurs.push(address);
+
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+    res.status(200).json({ message: 'Décodeur assigné avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur lors de l'assignation" });
+  }
+});
+
+// Dissociation des décodeurs
+app.post('/api/users/unassign-decoder', (req, res) => {
+  const { codePermanent, address } = req.body;
+
+  try {
+    const data = fs.readFileSync(USERS_FILE, 'utf8');
+    let users = JSON.parse(data);
+
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    if (users[userIndex].decodeurs) {
+      users[userIndex].decodeurs = users[userIndex].decodeurs.filter((a) => a !== address);
+    }
+
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+    res.status(200).json({ message: 'Décodeur dissocié avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur serveur lors de la dissociation' });
   }
 });
 
