@@ -599,6 +599,7 @@ async function deleteClient(id) {
 // Page client
 // ==========================
 
+// Récupération d'un client spécifique
 async function getClient(id) {
   try {
     const messageEl = document.getElementById('client-page-message');
@@ -619,6 +620,7 @@ async function getClient(id) {
   }
 }
 
+// Affichage des informations détaillées d'un client
 async function displayClientInfo() {
   const messageEl = document.getElementById('client-page-message');
   const container = document.getElementById('client-detailed-infos');
@@ -635,35 +637,6 @@ async function displayClientInfo() {
     `<p><strong>Nom :</strong> ${user.nom}</p>` +
     `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
     `<p><strong>Email :</strong> ${user.email}</p>`;
-}
-
-// Affichage des détails d'un client pour la page client.html
-async function showClientDetails() {
-  const container = document.getElementById('client-info');
-  const params = new URLSearchParams(window.location.search);
-  const clientId = params.get('id');
-
-  if (!clientId) {
-    console.error("Aucun ID de client trouvé dans l'URL.");
-    return;
-  }
-  try {
-    const res = await fetch(`${API_URL}/users`);
-    if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
-    const users = await res.json();
-    const client = users.find((u) => String(u.id) === String(clientId));
-    if (client) {
-      container.innerHTML = `
-      <div class="client-card">
-          <p><strong>ID :</strong> ${client.id}</p>
-          <p><strong>Nom :</strong> ${client.nom}</p>
-          <p><strong>Email :</strong> ${client.email}</p>
-          <hr />
-      </div>`;
-    }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des informations du client:', error);
-  }
 }
 
 // Affichage de la liste des décodeurs avec un bouton pour les supprimer
@@ -733,7 +706,6 @@ async function displayClientDecoders() {
           }
         });
       });
-      console.log('Données du client chargées avec succès :', client);
     } else {
       console.warn(`Aucun client trouvé avec l'ID : ${clientId}`);
     }
@@ -1231,7 +1203,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 30000); // 30 000 ms = 30 secondes
   }
   if (currentPath === 'client.html') {
-    await showClientDetails();
     await displayClientDecoders();
 
     const btnOpen = document.getElementById('btn-assign-decoder');
