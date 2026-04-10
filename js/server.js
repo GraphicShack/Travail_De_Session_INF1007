@@ -218,6 +218,38 @@ app.get('/api/client/:id', (req, res) => {
   }
 });
 
+// UPDATE A CLIENT
+app.post('/api/client/update', (req, res) => {
+  try {
+    const { userId, nom, email, codePermanent } = req.body;
+
+    const users = getUsers();
+    const userIndex = users.findIndex((u) => u.id === userId);
+
+    if (userIndex === -1) {
+      return res.status(404).json({
+        message: 'Client non trouvé',
+      });
+    }
+
+    // Mise à jour des informations du client
+    users[userIndex].nom = nom;
+    users[userIndex].email = email;
+    users[userIndex].codePermanent = codePermanent;
+
+    fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+
+    res.json({
+      message: 'Client modifié avec succès',
+      user: users[userIndex],
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erreur serveur',
+    });
+  }
+});
+
 // DELETE A USER
 app.delete('/api/users/:id', (req, res) => {
   try {
