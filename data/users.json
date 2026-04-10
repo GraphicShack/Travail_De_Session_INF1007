@@ -30,10 +30,10 @@
     "motDePasse": "-1083238412",
     "role": "user",
     "decodeurs": [
-      "127.0.10.1",
-      "127.0.10.2",
-      "127.0.10.3",
-      "127.0.10.4"
+      "127.0.10.6",
+      "127.0.10.7",
+      "127.0.10.8",
+      "127.0.10.5"
     ],
     "Chaines": []
   },
@@ -52,5 +52,22 @@
     "motDePasse": "-1083238412",
     "codePermanent": "TETE14141414",
     "role": "user"
+  },
+  {
+    "id": 6,
+    "nom": "Admin123",
+    "email": "alexisossene@gmail.com",
+    "motDePasse": "-904517469",
+    "codePermanent": "OSSA81360300",
+    "role": "admin"
+  },
+  {
+    "id": 7,
+    "nom": "Test",
+    "email": "test@test.com",
+    "motDePasse": "-1083238412",
+    "codePermanent": "TEST12341234",
+    "role": "user",
+    "decodeurs": []
   }
 ]

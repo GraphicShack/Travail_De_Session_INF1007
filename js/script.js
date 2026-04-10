@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (user && path.endsWith('/admin.html') && user.role !== 'admin') {
     alert('Accès refusé : page réservée aux administrateurs.');
     window.location.href = '/pages/signin.html';
+  } else if (user && path.endsWith('/client.html') && user.role !== 'admin') {
+    alert('Accès refusé : page réservée aux administrateurs.');
+    window.location.href = '/pages/signin.html';
   }
 });
 
@@ -631,8 +634,205 @@ async function displayClientInfo() {
     `<p><strong>ID :</strong> ${user.id}</p>` +
     `<p><strong>Nom :</strong> ${user.nom}</p>` +
     `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
-    `<p><strong>Email :</strong> ${user.email}</p>` +
-    `<p><strong>Décodeurs associés :</strong> ${user.decodeurs?.join(', ') || 'Aucun'}</p>`;
+    `<p><strong>Email :</strong> ${user.email}</p>`;
+}
+
+// Affichage des détails d'un client pour la page client.html
+async function showClientDetails() {
+  const container = document.getElementById('client-info');
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('id');
+
+  if (!clientId) {
+    console.error("Aucun ID de client trouvé dans l'URL.");
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/users`);
+    if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+    const users = await res.json();
+    const client = users.find((u) => String(u.id) === String(clientId));
+    if (client) {
+      container.innerHTML = `
+      <div class="client-card">
+          <p><strong>ID :</strong> ${client.id}</p>
+          <p><strong>Nom :</strong> ${client.nom}</p>
+          <p><strong>Email :</strong> ${client.email}</p>
+          <hr />
+      </div>`;
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des informations du client:', error);
+  }
+}
+
+// Affichage de la liste des décodeurs avec un bouton pour les supprimer
+async function displayClientDecoders() {
+  const container = document.getElementById('liste-decodeurs');
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('id');
+
+  if (!clientId) {
+    console.error("Aucun ID de client trouvé dans l'URL.");
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/users`);
+    if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+    const users = await res.json();
+    const client = users.find((u) => String(u.id) === String(clientId));
+
+    if (client) {
+      const decoders = client.decodeurs || [];
+      const decoderList = decoders.length
+        ? `
+            <div class="client-decoder-list">
+              ${decoders
+                .map(
+                  (address, index) => `
+                    <p class="client-decoder-item">
+                      <span>Décodeur ${index + 1} — ${address}</span>
+                      <button type="button" class="btn-unassign-decoder" data-address="${address}">Dissocier le décodeur</button>
+                      <hr />
+                    </p>
+                  `
+                )
+                .join('')}
+            </div>
+          `
+        : '<p>Aucun décodeur associé à ce client.</p>';
+
+      container.innerHTML = `
+        <div class="client-card">
+          <div class="client-decoders">
+            <br />
+            <h2>Décodeurs associés :</h2>
+            ${decoderList}
+          </div>
+          <br />
+        </div>
+      `;
+
+      container.querySelectorAll('.btn-unassign-decoder').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const address = button.dataset.address;
+          if (!client.codePermanent || !address) {
+            console.error('Code permanent ou adresse de décodeur manquante.');
+            return;
+          }
+          // Action du bouton de la dissociation
+          const confirmation = confirm(
+            `Êtes-vous sûr de vouloir dissocier le décodeurs ${address} ?`
+          );
+          if (!confirmation) return;
+          try {
+            await unassignDecoderFromClient(client.codePermanent, address);
+            alert(`Décodeur ${address} dissocié avec succès.`);
+          } catch (error) {
+            alert('Erreur: ' + error.message);
+          }
+        });
+      });
+      console.log('Données du client chargées avec succès :', client);
+    } else {
+      console.warn(`Aucun client trouvé avec l'ID : ${clientId}`);
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des informations du client:', error);
+  }
+}
+
+// Pour basculer entre l'affichage des décodeurs et l'assignation de décodeurs sur la page client.html
+async function switchDisplay(modeAjout) {
+  const sectionDecoders = document.getElementById('section-liste-decodeurs');
+  const sectionAssign = document.getElementById('section-assign-decodeurs');
+
+  if (modeAjout) {
+    sectionDecoders.style.display = 'none';
+    sectionAssign.style.display = 'block';
+    fillSelectDecoder();
+  } else {
+    sectionDecoders.style.display = 'block';
+    sectionAssign.style.display = 'none';
+  }
+}
+
+// Association d'un décodeur un client
+async function assignDecoderToClient(codePermanent, address) {
+  try {
+    const res = await fetch(`${API_URL}/users/assign-decoder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Erreur lors de l'assignation");
+    return data;
+  } catch (error) {
+    console.error("Erreur lors de l'assignation du décodeur:", error);
+    throw error;
+  }
+}
+
+// Dissociation d'un décodeur d'un client
+async function unassignDecoderFromClient(codePermanent, address) {
+  try {
+    const res = await fetch(`${API_URL}/users/unassign-decoder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur lors de la dissociation');
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la dissociation du décodeur:', error);
+    throw error;
+  }
+}
+
+// Remplissage dynamique de la liste des décodeurs disponible à l'assignation
+async function fillSelectDecoder() {
+  const select = document.getElementById('select-decoder-to-assign');
+  if (!select) return;
+
+  select.innerHTML = '<option value = "">Chargement des décodeurs...</option>';
+
+  try {
+    const res = await fetch(`${API_URL}/users`);
+    if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+    const users = await res.json();
+
+    const assignments = {};
+    users.forEach((user) => {
+      if (user.decodeurs) {
+        user.decodeurs.forEach((address) => {
+          assignments[address] = user.nom;
+          assignments[user] = user.id;
+        });
+      }
+    });
+
+    select.innerHTML = '<option value="">Sélectionnez un décodeur</option>';
+
+    DECODER_ADDRESSES.forEach((address) => {
+      const option = document.createElement('option');
+      option.value = address;
+
+      if (assignments[address]) {
+        option.textContent = `${address} (Assigné à ${assignments[address]})`;
+        option.disabled = true;
+        option.style.color = 'gray';
+      } else {
+        option.textContent = address;
+      }
+
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Erreur lors du remplissage de la liste des décodeurs:', error);
+    select.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
 }
 
 // ==========================
@@ -647,7 +847,7 @@ function displayUserInfo() {
   el.innerHTML = user ? `Connecté en tant que <strong>${user.nom}</strong>` : 'Non connecté';
 }
 
-// Affiche un petit résumé sous le nom d'utilisateur (fac nbr de décodeur/actifs/inactifs)
+// Affiche un petit résumé sous le nom d'utilisateur (nombre de décodeur/actifs/inactifs)
 async function displayUserSummary() {
   const user = getUser();
   const el = document.getElementById('user-info');
@@ -1029,6 +1229,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(() => {
       displayUserDecoders();
     }, 30000); // 30 000 ms = 30 secondes
+  }
+  if (currentPath === 'client.html') {
+    await showClientDetails();
+    await displayClientDecoders();
+
+    const btnOpen = document.getElementById('btn-assign-decoder');
+    if (btnOpen) {
+      btnOpen.addEventListener('click', () => switchDisplay(true));
+    }
+
+    const btnCancel = document.getElementById('btn-cancel-assignation');
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => switchDisplay(false));
+    }
+
+    const btnConfirm = document.getElementById('btn-confirm-assignation');
+    if (btnConfirm) {
+      btnConfirm.addEventListener('click', async () => {
+        const select = document.getElementById('select-decoder-to-assign');
+        const address = select.value;
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id');
+
+        if (!address) {
+          alert('Sélectionnez un décodeur à assigner');
+          return;
+        }
+
+        try {
+          const resUser = await fetch(`${API_URL}/users`);
+          const users = await resUser.json();
+          const client = users.find((u) => String(u.id) === String(clientId));
+          if (!client || !client.codePermanent) {
+            throw new Error('Client ou code permanent introuvable');
+          }
+
+          await assignDecoderToClient(client.codePermanent, address);
+          alert('Décodeur assigné avec succès');
+          window.location.reload();
+        } catch (error) {
+          alert(error.message || "Erreur lors de l'assignation du décodeur");
+        }
+      });
+    }
   }
 });
 
