@@ -50,6 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (user && path.endsWith('/client.html') && user.role !== 'admin') {
     alert('Accès refusé : page réservée aux administrateurs.');
     window.location.href = '/pages/signin.html';
+    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à createClient.html, rediriger vers signin
+  } else if (user && path.endsWith('/createClient.html') && user.role !== 'admin') {
+    alert('Accès refusé : page réservée aux administrateurs.');
+    window.location.href = '/pages/signin.html';
   }
 });
 
