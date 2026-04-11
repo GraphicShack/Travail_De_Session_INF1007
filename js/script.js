@@ -724,6 +724,13 @@ async function editClient(userId) {
     }
   }
 
+  // Si aucune donnée n'a changé, on affiche un message d'erreur pour éviter une requête inutile au serveur
+  if (nom === user.nom && email === user.email && codePermanent === user.codePermanent) {
+    messageEl.textContent = 'Aucune modification détectée';
+    messageEl.className = 'error';
+    return;
+  }
+
   try {
     const res = await fetch(`${API_URL}/client/update`, {
       method: 'POST',
@@ -738,7 +745,8 @@ async function editClient(userId) {
     }
     messageEl.textContent = 'Client modifié avec succès';
     messageEl.className = 'success';
-    setTimeout(() => (displayClientInfo), 1000);
+    window.alert('Client modifié avec succès');
+    displayClientInfo();
   } catch (err) {
     messageEl.textContent = 'Erreur serveur';
     messageEl.className = 'error';
