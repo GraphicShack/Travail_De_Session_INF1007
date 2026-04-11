@@ -404,12 +404,12 @@ fieldset legend {
 }
 
 /* Ligne client */
-.client-line button {
+.client-line button, .edit-client-form button {
   margin-top: 5px;
   margin-right: 10px;
 }
 
-.client-line button:last-child {
+.client-line button:last-child, .edit-client-form button:last-child {
   background-color: red;
   margin-right: 0;
 }

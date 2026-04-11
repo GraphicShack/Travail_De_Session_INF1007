@@ -655,10 +655,10 @@ function fillClientInfos(user) {
 // Création du code HTML pour afficher les inputs de modification des informations d'un client
 function fillClientInfosInputs(user) {
   return (
-    `<label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
+    `<div class="edit-client-form"><label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
     `<label for="client-code-permanent">Code Permanent </label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
     `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br>` +
-    `<button onclick="editClient(${user.id})">Enregistrer les modifications</button><button onclick="displayClientInfo()">Annuler</button>`
+    `<button onclick="editClient(${user.id})">Enregistrer les modifications</button><button onclick="displayClientInfo()">Annuler</button></div>`
   );
 }
 
