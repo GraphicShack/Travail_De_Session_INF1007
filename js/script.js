@@ -599,6 +599,7 @@ async function deleteClient(id) {
 // Page client
 // ==========================
 
+// Récupération d'un client spécifique
 async function getClient(id) {
   try {
     const messageEl = document.getElementById('client-page-message');
@@ -619,9 +620,15 @@ async function getClient(id) {
   }
 }
 
+// Affichage des informations détaillées d'un client
 async function displayClientInfo() {
   const messageEl = document.getElementById('client-page-message');
   const container = document.getElementById('client-detailed-infos');
+
+  // Réinitialisation du message d'erreur
+  messageEl.textContent = '';
+  messageEl.className = '';
+
   const params = new URLSearchParams(window.location.search);
   const userId = parseInt(params.get('id').trim());
   const user = await getClient(userId);
@@ -630,39 +637,119 @@ async function displayClientInfo() {
     messageEl.className = 'error';
     return;
   }
-  container.innerHTML =
+  container.innerHTML = fillClientInfos(user);
+}
+
+// Création du code HTML pour afficher les informations d'un client
+function fillClientInfos(user) {
+  return (
     `<p><strong>ID :</strong> ${user.id}</p>` +
     `<p><strong>Nom :</strong> ${user.nom}</p>` +
     `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
-    `<p><strong>Email :</strong> ${user.email}</p>`;
+    `<p><strong>Email :</strong> ${user.email}</p>` +
+    `<br>` +
+    `<button onclick="displayClientEditForm(${user.id})">Modifier les informations du client</button>`
+  );
 }
 
-// Affichage des détails d'un client pour la page client.html
-async function showClientDetails() {
-  const container = document.getElementById('client-info');
-  const params = new URLSearchParams(window.location.search);
-  const clientId = params.get('id');
+// Création du code HTML pour afficher les inputs de modification des informations d'un client
+function fillClientInfosInputs(user) {
+  return (
+    `<div class="edit-client-form"><label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
+    `<label for="client-code-permanent">Code Permanent </label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
+    `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br>` +
+    `<button onclick="editClient(${user.id})">Enregistrer les modifications</button><button onclick="displayClientInfo()">Annuler</button></div>`
+  );
+}
 
-  if (!clientId) {
-    console.error("Aucun ID de client trouvé dans l'URL.");
+// Affichage du formulaire de modification des informations d'un client
+async function displayClientEditForm(userId) {
+  const messageEl = document.getElementById('client-page-message');
+  const container = document.getElementById('client-detailed-infos');
+
+  // Réinitialisation du message d'erreur
+  messageEl.textContent = '';
+  messageEl.className = '';
+
+  const user = await getClient(userId);
+  if (!user) {
+    messageEl.textContent = 'Client non trouvé';
+    messageEl.className = 'error';
     return;
   }
-  try {
-    const res = await fetch(`${API_URL}/users`);
-    if (!res.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
-    const users = await res.json();
-    const client = users.find((u) => String(u.id) === String(clientId));
-    if (client) {
-      container.innerHTML = `
-      <div class="client-card">
-          <p><strong>ID :</strong> ${client.id}</p>
-          <p><strong>Nom :</strong> ${client.nom}</p>
-          <p><strong>Email :</strong> ${client.email}</p>
-          <hr />
-      </div>`;
+  container.innerHTML = fillClientInfosInputs(user);
+}
+
+// Enregistrement des modifications des informations d'un client
+async function editClient(userId) {
+  const messageEl = document.getElementById('client-page-message');
+  const nom = document.getElementById('client-name')?.value.trim();
+  const codePermanent = document.getElementById('client-code-permanent')?.value.trim();
+  const email = document.getElementById('client-email')?.value.trim();
+
+  // Réinitialisation du message d'erreur
+  messageEl.textContent = '';
+  messageEl.className = '';
+
+  // Récupération du client pour comparaison des données avant modification
+  const user = await getClient(userId);
+
+  // Validation des champs
+  if (!nom || !email || !codePermanent) {
+    messageEl.textContent = 'Veuillez remplir tous les champs';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation de l'email
+  if (!validateEmail(email)) {
+    messageEl.textContent = 'Email invalide';
+    messageEl.className = 'error';
+    return;
+  }
+
+  // Validation du code permanent (format AAAA00000000)
+  if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
+    messageEl.textContent = 'Code permanent invalide (format AAAA00000000)';
+    messageEl.className = 'error';
+    return;
+  }
+
+  if (email !== user.email) {
+    // Vérification si l'email existe déjà
+    if (await validateEmailAlreadyExists(email)) {
+      messageEl.textContent = 'Email déjà utilisé';
+      messageEl.className = 'error';
+      return;
     }
-  } catch (error) {
-    console.error('Erreur lors de la récupération des informations du client:', error);
+  }
+
+  // Si aucune donnée n'a changé, on affiche un message d'erreur pour éviter une requête inutile au serveur
+  if (nom === user.nom && email === user.email && codePermanent === user.codePermanent) {
+    messageEl.textContent = 'Aucune modification détectée';
+    messageEl.className = 'error';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/client/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, nom, email, codePermanent }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      messageEl.textContent = data.message || 'Erreur serveur';
+      messageEl.className = 'error';
+      return;
+    }
+    messageEl.textContent = 'Client modifié avec succès';
+    messageEl.className = 'success';
+    window.alert('Client modifié avec succès');
+    displayClientInfo();
+  } catch (err) {
+    messageEl.textContent = 'Erreur serveur';
+    messageEl.className = 'error';
   }
 }
 
@@ -733,7 +820,6 @@ async function displayClientDecoders() {
           }
         });
       });
-      console.log('Données du client chargées avec succès :', client);
     } else {
       console.warn(`Aucun client trouvé avec l'ID : ${clientId}`);
     }
@@ -1231,7 +1317,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 30000); // 30 000 ms = 30 secondes
   }
   if (currentPath === 'client.html') {
-    await showClientDetails();
     await displayClientDecoders();
 
     const btnOpen = document.getElementById('btn-assign-decoder');
