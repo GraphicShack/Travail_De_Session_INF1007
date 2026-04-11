@@ -474,3 +474,7 @@ p.client-decoder-item {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
+
+#client-page-message {
+  margin-top: 10px;
+}
