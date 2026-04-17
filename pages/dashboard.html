@@ -1,57 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <title>Dashboard</title>
-        <link rel="stylesheet" href="../css/style.css">
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
 
-    <body onload="protectPage(); displayUser(); chargerDashboard();">
-
-        <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="dashboard.html">Simulateur Décodeurs</a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="GestionDecodeur.html">Décodeurs</a></li>
-                <li><a href="admin.html" id="nav-admin-link">Admin</a></li>
-            </ul>
-            <div class="nav-logout">
-                <button id="btn-logout">Déconnexion</button>
-            </div>
+  <body
+    onload="
+      //protectPage();
+      //displayUser();
+      //chargerDashboard()
+    "
+  >
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <a href="dashboard.html">Simulateur Décodeurs</a>
         </div>
+        <ul class="nav-links">
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="GestionDecodeur.html">Décodeurs</a></li>
+          <li><a href="admin.html" id="nav-admin-link">Admin</a></li>
+        </ul>
+        <div class="nav-logout">
+          <button id="btn-logout">Déconnexion</button>
+        </div>
+      </div>
     </nav>
 
     <div class="container">
-            <h1>Dashboard</h1>
+      <h1>Dashboard</h1>
 
-            <p>Bienvenue <span id="nomUtilisateur"></span></p>
+      <p>Bienvenue <span id="nomUtilisateur"></span></p>
 
-            <!-- Zone mise à jour par JS : nom de l'utilisateur + résumé des décodeurs -->
-            <div id="user-info"></div>
+      <!-- Zone mise à jour par JS : nom de l'utilisateur + résumé des décodeurs -->
+      <div id="user-info"></div>
 
-            <!-- Section listant les décodeurs de l'utilisateur connecté -->
-            <div class="decoders-section-header">
-                <h3>Vos décodeurs</h3>
-            </div>
-            <div class="decoders-header">
-                <!-- Bouton pour forcer un rafraîchissement immédiat des cartes -->
-                <button id="btn-refresh-decoders">Rafraîchir</button>
-                <span id="last-update" class="last-update-text"></span>
-            </div>
-            <div class="decoders-section-bar"></div>
-            <!-- Cartes de décodeurs (remplies dynamiquement par displayUserDecoders) -->
-            <div id="user-decoders" class="decoders-grid"></div>
-        </div>
+      <!-- Section listant les décodeurs de l'utilisateur connecté -->
+      <div class="decoders-section-header">
+        <h3>Vos décodeurs</h3>
+      </div>
+      <div class="decoders-header">
+        <!-- Bouton pour forcer un rafraîchissement immédiat des cartes -->
+        <button id="btn-refresh-decoders">Rafraîchir</button>
+        <span id="last-update" class="last-update-text"></span>
+      </div>
+      <div class="decoders-section-bar"></div>
+      <!-- Cartes de décodeurs (remplies dynamiquement par displayUserDecoders) -->
+      <div id="user-decoders" class="decoders-grid"></div>
+    </div>
 
-        <div class="footer">
-            <p>&copy; 2026 INF1007 - Projet de session</p>
-        </div>
+    <div class="footer">
+      <p>&copy; 2026 INF1007 - Projet de session</p>
+    </div>
 
-        <script src="../js/script.js"></script>
-
-    </body>
-
+    <script type="module" src="../js/controllers/dashboardController.js"></script>
+    <script type="module" src="../js/controllers/authController.js"></script>
+  </body>
 </html>

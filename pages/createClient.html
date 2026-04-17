@@ -62,7 +62,8 @@
           placeholder="Confirmer le mot de passe"
           required
         />
-        <button type="button" onclick="createClient()">Ajouter le client</button>
+        <!--<button type="button" onclick="createClient()">Ajouter le client</button>-->
+        <button type="button" id="btn-create-client">Ajouter le client</button>
         <div id="client-creation-message"></div>
         <a href="admin.html">Retour à la liste des clients</a>
       </div>
@@ -71,6 +72,6 @@
       <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
 
-    <script src="../js/script.js"></script>
+    <script type="module" src="../js/controllers/clientController.js"></script>
   </body>
 </html>

@@ -1,43 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Créer un compte</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
 
-<body>
-
+  <body>
     <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-            <a href="dashboard.html">Simulateur Décodeurs</a>
-            </div>
+      <div class="nav-container">
+        <div class="nav-logo">
+          <a href="dashboard.html">Simulateur Décodeurs</a>
         </div>
+      </div>
     </nav>
     <div class="login-container">
-        <div class="login-card">
-            <h1>Créer un compte</h1>
+      <div class="login-card">
+        <h1>Créer un compte</h1>
 
-            <input id="nom" placeholder="Nom">
-            <input id="email" placeholder="Email">
-            <input id="code-permanent" placeholder="Code permanent (AAAA00000000)">
-            <input id="motdepasse" type="password" placeholder="Mot de passe">
-            <input id="confirm-motdepasse" type="password" placeholder="Confirmer le mot de passe">
+        <input id="nom" placeholder="Nom" />
+        <input id="email" placeholder="Email" />
+        <input id="code-permanent" placeholder="Code permanent (AAAA00000000)" />
+        <input id="motdepasse" type="password" placeholder="Mot de passe" />
+        <input id="confirm-motdepasse" type="password" placeholder="Confirmer le mot de passe" />
 
-            <button onclick="signup()">Créer le compte</button>
+        <!--<button onclick="signup()">Créer le compte</button>-->
+        <button type="button" id="btn-signup">S'inscrire</button>
 
-            <div id="signup-message"></div>
+        <div id="signup-message"></div>
 
-            <a href="signin.html">Déjà un compte ? Se connecter</a>
-        </div>
+        <a href="signin.html">Déjà un compte ? Se connecter</a>
+      </div>
     </div>
 
     <div class="footer">
-        <p>&copy; 2026 INF1007 - Projet de session</p>
+      <p>&copy; 2026 INF1007 - Projet de session</p>
     </div>
 
-    <script src="../js/script.js"></script>
-
-</body>
+    <script type="module" src="../js/controllers/authController.js"></script>
+  </body>
 </html>
