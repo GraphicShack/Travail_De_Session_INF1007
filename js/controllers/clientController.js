@@ -67,9 +67,9 @@ async function getClient(id) {
 }
 
 // Affichage des informations détaillées d'un client
-async function displayClientInfo() {
-  const messageEl = document.getElementById('client-page-message');
+export async function displayClientInfo() {
   const container = document.getElementById('client-detailed-infos');
+  const messageEl = document.getElementById('client-page-message');
 
   // Réinitialisation du message d'erreur
   messageEl.textContent = '';
@@ -232,7 +232,7 @@ async function assignDecoderToClient(codePermanent, address) {
 }
 
 // Dissociation d'un décodeur d'un client
-async function unassignDecoderFromClient(codePermanent, address) {
+export async function unassignDecoderFromClient(codePermanent, address) {
   try {
     const res = await fetch(`${API_URL}/users/unassign-decoder`, {
       method: 'POST',

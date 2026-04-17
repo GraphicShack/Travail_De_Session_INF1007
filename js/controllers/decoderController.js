@@ -1,11 +1,7 @@
-import {
-  getDecoderInfo,
-  reinitDecoder,
-  resetDecoder,
-  shutdownDecoder,
-} from '../services/decoderService.js';
+import { getDecoderInfo, reinitDecoder, resetDecoder } from '../services/decoderService.js';
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
+import { unassignDecoderFromClient } from './clientController.js';
 /*import { getUser } from './AuthController.js';
 import { getUser } from '/authController.js';
 import { getUser } from '/AuthController.js';
