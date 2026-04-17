@@ -92,9 +92,7 @@ function fillClientInfos(user) {
     `<p><strong>ID :</strong> ${user.id}</p>` +
     `<p><strong>Nom :</strong> ${user.nom}</p>` +
     `<p><strong>Code Permanent :</strong> ${user.codePermanent}</p>` +
-    `<p><strong>Email :</strong> ${user.email}</p>` +
-    `<br>` +
-    `<button onclick="displayClientEditForm(${user.id})">Modifier les informations du client</button>`
+    `<p><strong>Email :</strong> ${user.email}</p>`
   );
 }
 
@@ -104,7 +102,7 @@ function fillClientInfosInputs(user) {
     `<div class="edit-client-form"><label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
     `<label for="client-code-permanent">Code Permanent </label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
     `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br>` +
-    `<button onclick="editClient(${user.id})">Enregistrer les modifications</button><button onclick="displayClientInfo()">Annuler</button></div>`
+    `<button id="saveEditClientInfos">Enregistrer les modifications</button><button id='btnCancelEditClient'">Annuler</button></div>`
   );
 }
 
@@ -200,7 +198,7 @@ async function editClient(userId) {
 }
 
 // Pour basculer entre l'affichage des décodeurs et l'assignation de décodeurs sur la page client.html
-async function switchDisplay(modeAjout) {
+async function switchDisplayListDecoder(modeAjout) {
   const sectionDecoders = document.getElementById('section-liste-decodeurs');
   const sectionAssign = document.getElementById('section-assign-decodeurs');
 
@@ -211,6 +209,20 @@ async function switchDisplay(modeAjout) {
   } else {
     sectionDecoders.style.display = 'block';
     sectionAssign.style.display = 'none';
+  }
+}
+
+// Pour basculer entre l'affichage des infos du client et leur modifications
+async function switchDisplayEditClient(modeEdit) {
+  const sectionInfo = document.getElementById('client-infos');
+  const sectionEdit = document.getElementById('edit-client');
+
+  if (modeEdit) {
+    sectionInfo.style.display = 'none';
+    sectionEdit.style.display = 'block';
+  } else {
+    sectionEdit.style.display = 'none';
+    sectionInfo.style.display = 'block';
   }
 }
 
@@ -297,20 +309,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (currentPath === 'client.html') {
     await displayClientDecoders();
+    await displayClientInfo();
 
-    const btnOpen = document.getElementById('btn-assign-decoder');
-    if (btnOpen) {
-      btnOpen.addEventListener('click', () => switchDisplay(true));
+    const btnOpenDecoderList = document.getElementById('btn-assign-decoder');
+    if (btnOpenDecoderList) {
+      btnOpenDecoderList.addEventListener('click', () => switchDisplayListDecoder(true));
     }
 
-    const btnCancel = document.getElementById('btn-cancel-assignation');
-    if (btnCancel) {
-      btnCancel.addEventListener('click', () => switchDisplay(false));
+    const btnCancelAssignation = document.getElementById('btn-cancel-assignation');
+    if (btnCancelAssignation) {
+      btnCancelAssignation.addEventListener('click', () => switchDisplayListDecoder(false));
     }
 
-    const btnConfirm = document.getElementById('btn-confirm-assignation');
-    if (btnConfirm) {
-      btnConfirm.addEventListener('click', async () => {
+    const btnConfirmAssignation = document.getElementById('btn-confirm-assignation');
+    if (btnConfirmAssignation) {
+      btnConfirmAssignation.addEventListener('click', async () => {
         const select = document.getElementById('select-decoder-to-assign');
         const address = select.value;
         const params = new URLSearchParams(window.location.search);
@@ -334,6 +347,28 @@ document.addEventListener('DOMContentLoaded', async () => {
           window.location.reload();
         } catch (error) {
           alert(error.message || "Erreur lors de l'assignation du décodeur");
+        }
+      });
+    }
+
+    const btnOpenEditClient = document.getElementById('btnClientEditForm');
+    if (btnOpenEditClient) {
+      btnOpenEditClient.addEventListener('click', () => switchDisplayEditClient(true));
+    }
+
+    const btnCancelEditClient = document.getElementById('btnCancelEditClient');
+    if (btnCancelEditClient) {
+      btnCancelEditClient.addEventListener('click', () => switchDisplayEditClient(false));
+    }
+
+    const btnEditClient = document.getElementById('btnClientEditForm');
+    if (btnEditClient) {
+      btnEditClient.addEventListener('click', () => {
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id');
+
+        if (clientId) {
+          displayClientEditForm(clientId);
         }
       });
     }

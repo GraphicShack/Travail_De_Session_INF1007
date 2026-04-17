@@ -15,48 +15,8 @@ export async function getClients() {
     return null;
   }
 }
-/*
+
 // Login
-export async function signin() {
-  const email = document.getElementById('email')?.value.trim();
-  const motDePasse = document.getElementById('motdepasse')?.value.trim();
-  const messageEl = document.getElementById('login-message');
-
-  // Réinitialisation du message d'erreur
-  messageEl.textContent = '';
-  messageEl.className = '';
-  if (!email || !motDePasse) {
-    messageEl.textContent = 'Remplis tous les champs';
-    messageEl.className = 'error';
-    return;
-  }
-  // Hachage du mot de passe avant l'envoi (pour correspondre à ce qui est stocké côté serveur)
-  const hashedPwd = hachageMotDePasse(motDePasse);
-
-  // Envoi de la requête de connexion au serveur
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, motDePasse: hashedPwd }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      messageEl.textContent = data.message || 'Erreur serveur';
-      messageEl.className = 'error';
-      return;
-    }
-    // Stockage de l'utilisateur et redirection vers le dashboard
-    setUser(data.user);
-    messageEl.textContent = 'Connexion réussie, redirection...';
-    messageEl.className = 'success';
-    setTimeout(() => (window.location.href = '/pages/dashboard.html'), 1000);
-  } catch (err) {
-    messageEl.textContent = 'Erreur serveur';
-    messageEl.className = 'error';
-  }
-}*/
-
 export async function signin(email, password) {
   const hashedPwd = hachageMotDePasse(password);
 
@@ -77,89 +37,7 @@ export async function signin(email, password) {
   }
 }
 
-/*
-// Fonction d'inscription
-export async function signup() {
-  // Récupération des valeurs des champs et validation
-  const nom = document.getElementById('nom')?.value.trim();
-  const email = document.getElementById('email')?.value.trim();
-  const codePermanent = document.getElementById('code-permanent')?.value.trim();
-  const motDePasse = document.getElementById('motdepasse')?.value.trim();
-  const confirmPwd = document.getElementById('confirm-motdepasse')?.value.trim();
-  const messageEl = document.getElementById('signup-message');
-
-  // Réinitialisation du message d'erreur
-  messageEl.textContent = '';
-  messageEl.className = '';
-
-  // Validation des champs
-  if (!nom || !email || !motDePasse || !confirmPwd) {
-    messageEl.textContent = 'Remplis tous les champs';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Validation de l'email
-  if (!validateEmail(email)) {
-    messageEl.textContent = 'Email invalide';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Validation du code permanent (format AAAA00000000)
-  if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
-    messageEl.textContent = 'Code permanent invalide (format AAAA00000000)';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Vérification si l'email existe déjà
-  if (await validateEmailAlreadyExists(email)) {
-    messageEl.textContent = 'Email déjà utilisé';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Validation du mot de passe
-  if (!validatePassword(motDePasse)) {
-    messageEl.textContent = 'Mot de passe doit avoir au moins 8 caractères et une majuscule';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Validation de la confirmation du mot de passe
-  if (motDePasse !== confirmPwd) {
-    messageEl.textContent = 'Les mots de passe ne correspondent pas';
-    messageEl.className = 'error';
-    return;
-  }
-
-  // Hachage du mot de passe avant l'envoi
-  const hashedPwd = hachageMotDePasse(motDePasse);
-  // Envoi de la requête d'inscription au serveur
-  try {
-    const res = await fetch(`${API_URL}/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom, email, motDePasse: hashedPwd, codePermanent }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      messageEl.textContent = data.message || 'Erreur serveur';
-      messageEl.className = 'error';
-      return;
-    }
-    // Stockage de l'utilisateur et redirection vers le dashboard
-    setUser(data.user);
-    messageEl.textContent = 'Inscription réussie, redirection...';
-    messageEl.className = 'success';
-    setTimeout(() => (window.location.href = '/pages/dashboard.html'), 1000);
-  } catch (err) {
-    messageEl.textContent = 'Erreur serveur';
-    messageEl.className = 'error';
-  }
-}*/
-
+// Signup
 export async function signup(nom, email, codePermanent, password) {
   const pwdHache = hachageMotDePasse(password);
 

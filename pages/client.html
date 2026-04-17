@@ -24,7 +24,15 @@
     </nav>
     <div class="container">
       <h1>Informations sur le client</h1>
-      <div id="client-detailed-infos"></div>
+      <div id="client-infos">
+        <div id="client-detailed-infos"></div>
+        <button id="btnClientEditForm">Modifier les informations du client</button>
+      </div>
+
+      <div id="edit-client" style="display: none;">
+        <span id="edit-client-form"></span>
+        <button id="saveEditClientInfos">Enregistrer les modifications</button><button id='btnCancelEditClient'">Annuler</button>
+      </div>
       <div id="client-page-message"></div>
 
       <div id="section-liste-decodeurs">
@@ -46,9 +54,10 @@
     </div>
     <script type="module" src="../js/controllers/clientController.js"></script>
     <script>
+      /*
       document.addEventListener('DOMContentLoaded', async () => {
         await displayClientInfo();
-      });
+      });*/
     </script>
   </body>
 </html>
