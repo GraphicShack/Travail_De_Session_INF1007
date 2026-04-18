@@ -367,6 +367,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         switchDisplayEditClient(false);
       });
     }
+
+    const btnSaveEditClient = document.getElementById('saveEditClientInfos');
+    if (btnSaveEditClient) {
+      btnSaveEditClient.addEventListener('click', () => {
+        const params = new URLSearchParams(window.location.search);
+        const userId = parseInt(params.get('id').trim());
+        editClient(userId);
+      });
+    }
   }
 
   if (document.getElementById('listeUtilisateurs')) {
