@@ -99,16 +99,16 @@ function fillClientInfos(user) {
 // Création du code HTML pour afficher les inputs de modification des informations d'un client
 function fillClientInfosInputs(user) {
   return (
-    `<div class="edit-client-form"><label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
-    `<label for="client-code-permanent">Code Permanent </label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
-    `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br></div>`
+    `<div class="edit-client-form"><label for="client-name"><strong>Nom : </strong></label><input type="text" id="client-name" value="${user.nom}" /><br>` +
+    `<label for="client-code-permanent"><strong>Code Permanent : </strong></label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
+    `<label for="client-email"><strong>Email : </strong></label><input type="email" id="client-email" value="${user.email}" /></div><br />`
   );
 }
 
 // Affichage du formulaire de modification des informations d'un client
 async function displayClientEditForm(userId) {
   const messageEl = document.getElementById('client-page-message');
-  const container = document.getElementById('client-detailed-infos');
+  const container = document.getElementById('edit-client-form');
 
   // Réinitialisation du message d'erreur
   messageEl.textContent = '';
