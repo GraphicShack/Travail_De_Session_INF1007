@@ -101,8 +101,7 @@ function fillClientInfosInputs(user) {
   return (
     `<div class="edit-client-form"><label for="client-name">Nom </label><input type="text" id="client-name" value="${user.nom}" /><br>` +
     `<label for="client-code-permanent">Code Permanent </label><input type="text" id="client-code-permanent" value="${user.codePermanent}" /><br>` +
-    `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br>` +
-    `<button id="saveEditClientInfos">Enregistrer les modifications</button><button id='btnCancelEditClient'">Annuler</button></div>`
+    `<label for="client-email">Email </label><input type="email" id="client-email" value="${user.email}" /><br></div>`
   );
 }
 
@@ -221,8 +220,8 @@ async function switchDisplayEditClient(modeEdit) {
     sectionInfo.style.display = 'none';
     sectionEdit.style.display = 'block';
   } else {
-    sectionEdit.style.display = 'none';
     sectionInfo.style.display = 'block';
+    sectionEdit.style.display = 'none';
   }
 }
 
@@ -352,24 +351,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const btnOpenEditClient = document.getElementById('btnClientEditForm');
-    if (btnOpenEditClient) {
-      btnOpenEditClient.addEventListener('click', () => switchDisplayEditClient(true));
-    }
-
     const btnCancelEditClient = document.getElementById('btnCancelEditClient');
-    if (btnCancelEditClient) {
-      btnCancelEditClient.addEventListener('click', () => switchDisplayEditClient(false));
-    }
-
-    const btnEditClient = document.getElementById('btnClientEditForm');
-    if (btnEditClient) {
-      btnEditClient.addEventListener('click', () => {
+    if (btnOpenEditClient) {
+      // Ouvre le form pour modifier les infos du client
+      btnOpenEditClient.addEventListener('click', () => {
         const params = new URLSearchParams(window.location.search);
-        const clientId = params.get('id');
-
-        if (clientId) {
-          displayClientEditForm(clientId);
-        }
+        const userId = parseInt(params.get('id').trim());
+        displayClientEditForm(userId);
+        switchDisplayEditClient(true);
+      });
+    }
+    if (btnCancelEditClient) {
+      btnCancelEditClient.addEventListener('click', () => {
+        displayClientInfo();
+        switchDisplayEditClient(false);
       });
     }
   }
