@@ -44,7 +44,7 @@ export async function signup(nom, email, codePermanent, password) {
   const res = await fetch(`${API_URL}/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nom, email, codePermanent, password: pwdHache }),
+    body: JSON.stringify({ nom, email, codePermanent, motDePasse: pwdHache }),
   });
 
   const data = await res.json();

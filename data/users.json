@@ -15,6 +15,14 @@
     "Chaines": []
   },
   {
+    "id": 2,
+    "nom": "Alec",
+    "codePermanent": "PAQA78050208",
+    "email": "paquette.alecc2@gmail.com",
+    "motDePasse": "-1083238412",
+    "role": "user"
+  },
+  {
     "id": 3,
     "nom": "Test",
     "codePermanent": "LEFF87100303",
@@ -22,9 +30,28 @@
     "motDePasse": "-1083238412",
     "role": "user",
     "decodeurs": [
+      "127.0.10.6",
+      "127.0.10.7",
+      "127.0.10.8",
       "127.0.10.5"
     ],
     "Chaines": []
+  },
+  {
+    "id": 4,
+    "nom": "Joe",
+    "email": "Joe@gmail.com",
+    "motDePasse": "-1083238412",
+    "codePermanent": "JOTE50607080",
+    "role": "user"
+  },
+  {
+    "id": 5,
+    "nom": "test",
+    "email": "test2@gmail.com",
+    "motDePasse": "-1083238412",
+    "codePermanent": "TETE14141414",
+    "role": "user"
   },
   {
     "id": 6,
@@ -33,5 +60,14 @@
     "motDePasse": "-904517469",
     "codePermanent": "OSSA81360300",
     "role": "admin"
+  },
+  {
+    "id": 7,
+    "nom": "Test",
+    "email": "test@test.com",
+    "motDePasse": "-1083238412",
+    "codePermanent": "TEST12341234",
+    "role": "user",
+    "decodeurs": []
   }
 ]

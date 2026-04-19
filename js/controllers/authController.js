@@ -103,24 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
       // Validation des champs
       if (!nom || !email || !motDePasse || !confirmPwd) {
         if (messageSignup) messageSignup.textContent = 'Veuillez remplir tous les champs.';
+        messageSignup.className = 'error';
+        return;
       }
 
       // Validation de l'email
       if (!validateEmail(email)) {
         if (messageSignup) messageSignup.textContent = 'Email invalide';
+        messageSignup.className = 'error';
+        return;
       }
 
       // Vérification si l'email existe déjà
       if (await validateEmailAlreadyExists(email)) {
-        if (messageSignup)
-          messageSignup.textContent =
-            'Mot de passe doit avoir au moins 8 caractères et une majuscule';
-      }
-
-      // Validation du code permanent (format AAAA00000000)
-      if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
-        if (messageSignup)
-          messageSignup.textContent = 'Code permanent invalide (format AAAA00000000)';
+        if (messageSignup) messageSignup.textContent = 'Email déjà utilisé';
+        messageSignup.className = 'error';
+        return;
       }
 
       // Validation du mot de passe
@@ -128,11 +126,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (messageSignup)
           messageSignup.textContent =
             'Mot de passe doit avoir au moins 8 caractères et une majuscule';
+        messageSignup.className = 'error';
+        return;
+      }
+
+      // Validation du code permanent (format AAAA00000000)
+      if (!/^[A-Z]{4}\d{8}$/.test(codePermanent)) {
+        if (messageSignup)
+          messageSignup.textContent = 'Code permanent invalide (format AAAA00000000)';
+        messageSignup.className = 'error';
+        return;
+      }
+
+      // Validation du mot de passe
+      if (!validatePassword(motDePasse)) {
+        if (messageSignup)
+          messageSignup.textContent =
+            'Mot de passe doit avoir au moins 8 caractères et une majuscule';
+        messageSignup.className = 'error';
+        return;
       }
 
       // Validation de la confirmation du mot de passe
       if (motDePasse !== confirmPwd) {
         if (messageSignup) messageSignup.textContent = 'Les mots de passe ne correspondent pas';
+        messageSignup.className = 'error';
+        return;
       }
 
       try {
