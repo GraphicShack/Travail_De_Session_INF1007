@@ -51,5 +51,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "liveServer.settings.ignoreFiles": ["**/backend/**", "**/data/**", "**/users.json"]
 }
