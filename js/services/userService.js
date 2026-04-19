@@ -72,8 +72,8 @@ export async function deleteClient(id) {
       messageEl.className = 'error';
       return;
     }
-    messageEl.textContent = 'Client supprimé avec succès';
-    messageEl.className = 'success';
+    window.alert('Client supprimé avec succès');
+    setTimeout(() => {window.location.reload();}, 1000);
   } catch (error) {
     messageEl.textContent = 'Erreur serveur';
     messageEl.className = 'error';
@@ -152,8 +152,8 @@ export async function createClient() {
       messageEl.className = 'error';
       return;
     }
-    messageEl.textContent = 'Client créé avec succès';
-    messageEl.className = 'success';
+    window.alert('Client créé avec succès');
+    setTimeout(() => {window.location.reload();}, 1000);
   } catch (err) {
     messageEl.textContent = 'Erreur serveur';
     messageEl.className = 'error';

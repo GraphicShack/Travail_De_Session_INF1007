@@ -186,10 +186,8 @@ async function editClient(userId) {
       messageEl.className = 'error';
       return;
     }
-    messageEl.textContent = 'Client modifié avec succès';
-    messageEl.className = 'success';
     window.alert('Client modifié avec succès');
-    displayClientInfo();
+    setTimeout(() => { window.location.reload(); }, 1000);
   } catch (err) {
     messageEl.textContent = 'Erreur serveur';
     messageEl.className = 'error';

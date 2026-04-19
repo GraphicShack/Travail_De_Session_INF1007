@@ -79,6 +79,7 @@ export async function displayClientDecoders() {
           try {
             await unassignDecoderFromClient(client.codePermanent, address);
             alert(`Décodeur ${address} dissocié avec succès.`);
+            setTimeout(() => { window.location.reload(); }, 1000);
           } catch (error) {
             alert('Erreur: ' + error.message);
           }
