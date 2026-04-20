@@ -11,10 +11,6 @@ import {
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
 import { unassignDecoderFromClient } from './clientController.js';
-/*import { getUser } from './AuthController.js';
-import { getUser } from '/authController.js';
-import { getUser } from '/AuthController.js';
-*/
 
 const EVENEMENT_ETAT_DECODEUR = 'decodeur:etatChange';
 const decodeurParAdresse = new Map();
@@ -159,10 +155,10 @@ export async function displayClientDecoders() {
             <div class="client-decoder-list">
               ${decoders
                 .map(
-                  (address, index) => `
+                  (decodeurs, index) => `
                     <p class="client-decoder-item">
-                      <span>Décodeur ${index + 1} — ${address}</span>
-                      <button type="button" class="btn-unassign-decoder" data-address="${address}">Dissocier le décodeur</button>
+                      <span>Décodeur ${index + 1} — ${decodeurs.adresse}</span>
+                      <button type="button" class="btn-unassign-decoder" data-address="${decodeurs.adresse}">Dissocier le décodeur</button>
                       <hr />
                     </p>
                   `
@@ -202,7 +198,7 @@ export async function displayClientDecoders() {
               window.location.reload();
             }, 1000);
           } catch (error) {
-            alert('Erreur: ' + error.message);
+            alert('Erreur: ' + error.message + '.');
           }
         });
       });
@@ -242,7 +238,7 @@ export async function displayUserDecoders() {
       return;
     }
     for (let i = 0; i < decoders.length; i++) {
-      const address = decoders[i];
+      const address = decoders[i].adresse;
 
       const card = document.createElement('div');
       card.className = 'decoder-card';
@@ -627,8 +623,8 @@ async function initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDec
       const decoders = user?.decodeurs || [];
       decoders.forEach((addr) => {
         const opt = document.createElement('option');
-        opt.value = addr;
-        opt.textContent = addr;
+        opt.value = addr.adresse;
+        opt.textContent = addr.adresse;
         selectUserDecoder.appendChild(opt);
       });
     });

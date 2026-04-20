@@ -65,7 +65,6 @@ app.post('/api/login', (req, res) => {
       role: userData.role,
       codePermanent: userData.codePermanent,
       decodeurs: userData.decodeurs || [],
-      chaines: userData.Chaines || userData.chaines || [],
     };
 
     res.json({
@@ -279,7 +278,9 @@ app.post('/api/users/assign-decoder', (req, res) => {
       return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
 
-    const isAlreadyAssigned = users.some((u) => u.decodeurs && u.decodeurs.includes(address));
+    const isAlreadyAssigned = users.some(
+      (u) => u.decodeurs && u.decodeurs.some((d) => d.adresse === address)
+    );
     if (isAlreadyAssigned) {
       return res
         .status(400)
@@ -289,11 +290,11 @@ app.post('/api/users/assign-decoder', (req, res) => {
     if (!users[userIndex].decodeurs) {
       users[userIndex].decodeurs = [];
     }
-    users[userIndex].decodeurs.push({ adresse: address, chaine: [] });
+    users[userIndex].decodeurs.push({ adresse: address, chaines: [] });
 
     fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
 
-    res.status(200).json({ message: 'Décodeur assigné avec succès' });
+    res.status(200).json({ message: 'Décodeur assigné avec succès.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur serveur lors de l'assignation" });
@@ -312,7 +313,7 @@ app.post('/api/users/unassign-decoder', (req, res) => {
     }
 
     if (users[userIndex].decodeurs) {
-      users[userIndex].decodeurs = users[userIndex].decodeurs.filter((a) => a !== address);
+      users[userIndex].decodeurs = users[userIndex].decodeurs.filter((d) => d.adresse !== address);
     }
 
     fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
@@ -348,8 +349,8 @@ app.post('/api/decoder/assign-channel', (req, res) => {
       return res.status(403).json({ message: "Ce decodeur n'appartient pas à ce client" });
     }
 
-    if (!decodeur.chaines.includes(chaine)) {
-      decodeur.chaines.push(chaine);
+    if (!decodeur.Chaines.includes(chaine)) {
+      decodeur.Chaines.push(chaine);
       fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
       return res.status(200).json({ message: 'Chaîne ajoutée avec succès' });
     } else {
@@ -374,9 +375,9 @@ app.post('/api/decoder/remove-channel', (req, res) => {
     if (!decodeur)
       return res.status(403).json({ message: "Ce décodeur n'appartient pas à ce client" });
 
-    const indexChaine = decodeur.chaines.indexOf(chaine);
+    const indexChaine = decodeur.Chaines.indexOf(chaine);
     if (indexChaine !== -1) {
-      decodeur.chaines.splice(indexChaine, 1);
+      decodeur.Chaines.splice(indexChaine, 1);
       fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
       return res.status(200).json({ message: 'Chaîne retirée avec succès' });
     } else {

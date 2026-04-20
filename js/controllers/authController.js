@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/pages/dashboard.html';
       } catch (error) {
         console.error("L'ERREUR RÉELLE EST :", error); // Regarde ceci dans la console (F12)
-        alert('Erreur détectée : ' + error.message);
+        alert('Erreur détectée : ' + error.message + '.');
         /*if (messageSignin) {
           messageSignin.textContent = error.message;
           messageSignin.className = 'error';

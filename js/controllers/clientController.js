@@ -186,8 +186,10 @@ async function editClient(userId) {
       messageEl.className = 'error';
       return;
     }
-    window.alert('Client modifié avec succès');
-    setTimeout(() => { window.location.reload(); }, 1000);
+    window.alert('Client modifié avec succès.');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   } catch (err) {
     messageEl.textContent = 'Erreur serveur';
     messageEl.className = 'error';
@@ -272,8 +274,8 @@ async function fillSelectDecoder() {
     const assignments = {};
     users.forEach((user) => {
       if (user.decodeurs) {
-        user.decodeurs.forEach((address) => {
-          assignments[address] = user.nom;
+        user.decodeurs.forEach((decodeur) => {
+          assignments[decodeur.adresse] = user.nom;
           assignments[user] = user.id;
         });
       }
@@ -327,7 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const clientId = params.get('id');
 
         if (!address) {
-          alert('Sélectionnez un décodeur à assigner');
+          alert('Sélectionnez un décodeur à assigner.');
           return;
         }
 
@@ -340,7 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
 
           await assignDecoderToClient(client.id, address);
-          alert('Décodeur assigné avec succès');
+          alert('Décodeur assigné avec succès.');
           window.location.reload();
         } catch (error) {
           alert(error.message || "Erreur lors de l'assignation du décodeur");
