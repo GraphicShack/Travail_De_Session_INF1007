@@ -224,12 +224,12 @@ async function switchDisplayEditClient(modeEdit) {
 }
 
 // Association d'un décodeur un client
-async function assignDecoderToClient(codePermanent, address) {
+async function assignDecoderToClient(id, address) {
   try {
     const res = await fetch(`${API_URL}/users/assign-decoder`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codePermanent, address }),
+      body: JSON.stringify({ id, address }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Erreur lors de l'assignation");
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Client ou code permanent introuvable');
           }
 
-          await assignDecoderToClient(client.codePermanent, address);
+          await assignDecoderToClient(client.id, address);
           alert('Décodeur assigné avec succès');
           window.location.reload();
         } catch (error) {
