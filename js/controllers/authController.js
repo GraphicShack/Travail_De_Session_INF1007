@@ -36,21 +36,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Si l'utilisateur est connecté et essaie d'accéder à signin ou signup, rediriger vers dashboard
   } else if (user && (path.endsWith('/signin.html') || path.endsWith('/signup.html'))) {
     window.location.href = '/pages/dashboard.html';
-    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à admin.html, rediriger vers signin
+    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à admin.html, rediriger vers dashboard
   } else if (user && path.endsWith('/admin.html') && user.role !== 'admin') {
     alert('Accès refusé : page réservée aux administrateurs.');
-    window.location.href = '/pages/signin.html';
+    window.location.href = '/pages/dashboard.html';
+    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à client.html, rediriger vers dashboard
   } else if (user && path.endsWith('/client.html') && user.role !== 'admin') {
     alert('Accès refusé : page réservée aux administrateurs.');
-    window.location.href = '/pages/signin.html';
-    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à createClient.html, rediriger vers signin
+    window.location.href = '/pages/dashboard.html';
+    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à createClient.html, rediriger vers dashboard
   } else if (user && path.endsWith('/createClient.html') && user.role !== 'admin') {
     alert('Accès refusé : page réservée aux administrateurs.');
-    window.location.href = '/pages/signin.html';
+    window.location.href = '/pages/dashboard.html';
+    // Si l'utilisateur est connecté mais n'est pas admin et essaie d'accéder à GestionDecodeur.html, rediriger vers dashboard
+  } else if (user && path.endsWith('/pages/GestionDecodeur.html') && user.role !== 'admin') {
+    alert('Accès refusé : page réservée aux administrateurs.');
+    window.location.href = '/pages/dashboard.html';
   }
 
   const btnSignin = document.getElementById('btn-signin');
-  const messageSignin = document.getElementById('signin-message');
+  const messageSignin = document.getElementById('login-message');
 
   if (btnSignin) {
     btnSignin.addEventListener('click', async (e) => {

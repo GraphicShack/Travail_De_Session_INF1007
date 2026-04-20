@@ -63,8 +63,12 @@ if (typeof window !== 'undefined') {
 // Affichage du lien admin dans la nav si l'utilisateur est admin
 export function displayNav() {
   const user = getUser();
-  const adminLink = document.getElementById('nav-admin-link');
-  if (adminLink) adminLink.style.display = user && user.role === 'admin' ? 'inline' : 'none';
+  const adminLink = document.getElementsByClassName('nav-admin-link');
+  if (adminLink) {
+    for (let i = 0; i < adminLink.length; i++) {
+      adminLink[i].style.display = user && user.role === 'admin' ? 'inline' : 'none';
+    }
+  }
 }
 
 // Mise en surbrillance du lien actif dans la nav

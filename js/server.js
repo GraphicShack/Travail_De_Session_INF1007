@@ -268,12 +268,12 @@ app.delete('/api/users/:id', (req, res) => {
   }
 });
 app.post('/api/users/assign-decoder', (req, res) => {
-  const { codePermanent, address } = req.body;
+  const { id, address } = req.body;
 
   try {
     let users = getUsers();
 
-    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    const userIndex = users.findIndex((u) => u.id === id);
     if (userIndex === -1) {
       return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
@@ -300,12 +300,12 @@ app.post('/api/users/assign-decoder', (req, res) => {
 });
 
 app.post('/api/users/unassign-decoder', (req, res) => {
-  const { codePermanent, address } = req.body;
+  const { id, address } = req.body;
 
   try {
     let users = getUsers();
 
-    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    const userIndex = users.findIndex((u) => u.id === id);
     if (userIndex === -1) {
       return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
