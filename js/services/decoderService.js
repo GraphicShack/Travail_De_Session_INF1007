@@ -1,5 +1,4 @@
-// import { getDecoderInfo } from '../services/decoderService.js';
-import { ACTIONS, BASE_URL, DECODER_ADDRESSES } from '../utils/config.js';
+import { ACTIONS, API_URL, BASE_URL, DECODER_ADDRESSES } from '../utils/config.js';
 
 // Validation de l'adresse IP du décodeur
 export function isValidDecoderIp(ip) {
@@ -67,4 +66,40 @@ export async function getAllDecodersInfo(id) {
     }
   }
   return results;
+}
+
+export async function assignChannelToDecoder(codePermanent, address, chaine) {
+  try {
+    const response = await fetch(`${API_URL}/decoder/assign-channel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address, chaine }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Erreur lors de l'assignation de la chaîne");
+    }
+    return data;
+  } catch (error) {
+    console.error('Erreur decoderService.assignChannelToDecoder:', error);
+    throw error;
+  }
+}
+
+export async function removeChannelFromDecoder(codePermanent, address, chaine) {
+  try {
+    const response = await fetch(`${API_URL}/decoder/remove-channel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codePermanent, address, chaine }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Erreur lors du retrait de la chaîne');
+    return data;
+  } catch (error) {
+    console.error('Erreur decoderService.removeChannelFromDecoder:', error);
+    throw error;
+  }
 }

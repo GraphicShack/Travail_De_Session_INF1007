@@ -1,4 +1,11 @@
-import { getDecoderInfo, reinitDecoder, resetDecoder, shutdownDecoder } from '../services/decoderService.js';
+import {
+  assignChannelToDecoder,
+  getDecoderInfo,
+  reinitDecoder,
+  removeChannelFromDecoder,
+  resetDecoder,
+  shutdownDecoder,
+} from '../services/decoderService.js';
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
 import { unassignDecoderFromClient } from './clientController.js';
@@ -540,6 +547,53 @@ function chargerDecodeurDepuisSelectionUser() {
 
   // Réutiliser la logique existante
   boutonAfficherClique();
+}
+
+// Ajouter une chaine
+export async function handleAssignChannel(event) {
+  event.preventDefault();
+
+  const button = event.currentTarget;
+  const address = button.getAttribute('data-ip');
+
+  const inputChaine = button.previousElementSibling;
+  const chaine = inputChaine.value.trim();
+
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+  if (!chaine) {
+    alert('Veuillez entrer un nom de chaîne.');
+    return;
+  }
+
+  try {
+    const response = await assignChannelToDecoder(codePermanent, address, chaine);
+    alert(response.message);
+
+    inputChaine.value = '';
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+export async function handleRemoveChannel(event) {
+  event.preventDefault();
+
+  const button = event.currentTarget;
+  const address = button.getAttribute('data-ip');
+  const chaine = button.getAttribute('data-chaine');
+
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  const codePermanent = currentUser.codePermanent;
+
+  if (confirm(`Voulez-vous vraiment retirer la chaine ${chaine} ?`)) {
+    try {
+      const response = await removeChannelFromDecoder(codePermanent, address, chaine);
+      alert(response.message);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
 }
 
 // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard

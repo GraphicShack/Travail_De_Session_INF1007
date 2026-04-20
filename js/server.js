@@ -267,6 +267,7 @@ app.delete('/api/users/:id', (req, res) => {
     });
   }
 });
+
 app.post('/api/users/assign-decoder', (req, res) => {
   const { id, address } = req.body;
 
@@ -288,7 +289,7 @@ app.post('/api/users/assign-decoder', (req, res) => {
     if (!users[userIndex].decodeurs) {
       users[userIndex].decodeurs = [];
     }
-    users[userIndex].decodeurs.push(address);
+    users[userIndex].decodeurs.push({ adresse: address, chaine: [] });
 
     fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
 
@@ -320,6 +321,69 @@ app.post('/api/users/unassign-decoder', (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erreur serveur lors de la dissociation.' });
+  }
+});
+
+// Assigner chaine
+app.post('/api/decoder/assign-channel', (req, res) => {
+  const { codePermanent, address, chaine } = req.body;
+
+  if (!codePermanent || !address || !chaine) {
+    return res.status(400).json({
+      message: 'Champs manquants',
+    });
+  }
+
+  try {
+    let users = getUsers();
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'Client introuvable' });
+    }
+
+    const decodeur = users[userIndex].decodeurs.find((d) => d.address === address);
+
+    if (!decodeur) {
+      return res.status(403).json({ message: "Ce decodeur n'appartient pas à ce client" });
+    }
+
+    if (!decodeur.chaines.includes(chaine)) {
+      decodeur.chaines.push(chaine);
+      fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+      return res.status(200).json({ message: 'Chaîne ajoutée avec succès' });
+    } else {
+      return res.status(400).json({ message: 'Cette chaîne est déjà sur ce décodeur' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+app.post('/api/decoder/remove-channel', (req, res) => {
+  const { codePermanent, address, chaine } = req.body;
+
+  try {
+    let users = getUsers();
+    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+
+    if (userIndex === -1) return res.status(404).json({ message: 'Client introuvable' });
+
+    const decodeur = users[userIndex].decodeurs.find((d) => d.adresse === address);
+
+    if (!decodeur)
+      return res.status(403).json({ message: "Ce décodeur n'appartient pas à ce client" });
+
+    const indexChaine = decodeur.chaines.indexOf(chaine);
+    if (indexChaine !== -1) {
+      decodeur.chaines.splice(indexChaine, 1);
+      fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
+      return res.status(200).json({ message: 'Chaîne retirée avec succès' });
+    } else {
+      return res.status(400).json({ message: "Cette chaîne n'est pas sur ce décodeur" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
