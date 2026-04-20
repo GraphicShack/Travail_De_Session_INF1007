@@ -1,3 +1,5 @@
+import Decodeur from '../../model/Decodeur.js';
+import { EtatDecodeur } from '../../model/EtatDecodeur.js';
 import { getDecoderInfo, reinitDecoder, resetDecoder, shutdownDecoder } from '../services/decoderService.js';
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
@@ -7,7 +9,117 @@ import { displayUserSummary } from './dashboardController.js';
 import { getUser } from '/authController.js';
 import { getUser } from '/AuthController.js';
 */
+
+const EVENEMENT_ETAT_DECODEUR = 'decodeur:etatChange';
+const decodeurParAdresse = new Map();
+let ecouteurNotificationsEtatInitialise = false;
+let intervalSurveillanceGlobal = null;
+
+function normaliserEtatDepuisApi(etatApi) {
+  const valeur = String(etatApi || '').toLowerCase();
+  if (!valeur) return null;
+  if (['active', 'actif', 'allume', 'allumé', 'on'].includes(valeur)) return EtatDecodeur.ALLUME;
+  if (['restarting', 'en_redemarrage', 'resetting', 'reinit', 'redemarrage'].includes(valeur)) {
+    return EtatDecodeur.EN_REDEMARRAGE;
+  }
+  if (['off', 'inactive', 'inactif', 'shutdown', 'eteint', 'éteint'].includes(valeur)) {
+    return EtatDecodeur.ETEINT;
+  }
+  return EtatDecodeur.HORS_SERVICE;
+}
+
+function obtenirOuCreerDecodeur(address) {
+  if (!address) return null;
+  if (!decodeurParAdresse.has(address)) {
+    const numeroSerie = String(address).split('.').pop() || address;
+    const decodeur = new Decodeur(address, numeroSerie, address);
+    decodeur.ajouterObservateur((detail) => {
+      if (typeof window === 'undefined') return;
+      window.dispatchEvent(new CustomEvent(EVENEMENT_ETAT_DECODEUR, { detail }));
+    });
+    decodeurParAdresse.set(address, decodeur);
+  }
+  return decodeurParAdresse.get(address);
+}
+
+function synchroniserEtatDecodeur(address, etatApi) {
+  const decodeur = obtenirOuCreerDecodeur(address);
+  if (!decodeur) return;
+
+  const nouvelEtat = normaliserEtatDepuisApi(etatApi);
+  if (!nouvelEtat) return;
+
+  const ancienEtat = decodeur.obtenirEtat();
+  const estPremiereObservation = !decodeur.__etatObserve;
+  decodeur.__etatObserve = true;
+
+  if (!estPremiereObservation && ancienEtat !== nouvelEtat) {
+    decodeur.changerEtat(nouvelEtat);
+    return;
+  }
+
+  decodeur.etat = nouvelEtat;
+}
+
+function initialiserNotificationsEtatDecodeur() {
+  if (ecouteurNotificationsEtatInitialise || typeof window === 'undefined') return;
+  ecouteurNotificationsEtatInitialise = true;
+
+  window.addEventListener(EVENEMENT_ETAT_DECODEUR, (event) => {
+    const detail = event?.detail;
+    if (!detail) return;
+
+    const message = `Décodeur ${detail.adresse} : état changé de ${detail.ancienEtat} à ${detail.nouvelEtat}`;
+    window.alert(message);
+  });
+}
+
+async function surveillerDecodeursUtilisateurConnecte() {
+  const user = getUser?.();
+  if (!user?.email && !user?.codePermanent) return;
+
+  try {
+    const res = await fetch(`${API_URL}/users`);
+    if (!res.ok) return;
+    const users = await res.json();
+    const fullUser = users.find(
+      (u) => u.email === user.email || u.codePermanent === user.codePermanent
+    );
+
+    const codePermanent = fullUser?.codePermanent || user.codePermanent;
+    const decoders = fullUser?.decodeurs || [];
+    if (!codePermanent || !decoders.length) return;
+
+    await Promise.all(
+      decoders.map(async (address) => {
+        try {
+          const info = await getDecoderInfo(codePermanent, address);
+          synchroniserEtatDecodeur(address, info?.state);
+        } catch (e) {
+          msg(`Surveillance décodeur ${address} impossible: ${e.message}`, 'debug');
+        }
+      })
+    );
+  } catch (e) {
+    msg(`Surveillance globale en erreur: ${e.message}`, 'debug');
+  }
+}
+
+function demarrerSurveillanceGlobaleDecodeurs() {
+  if (typeof window === 'undefined' || intervalSurveillanceGlobal) return;
+
+  // Premier passage immédiat (sans alerte au premier état connu)
+  surveillerDecodeursUtilisateurConnecte();
+
+  // Vérification périodique: notifications d'état, peu importe la page
+  intervalSurveillanceGlobal = window.setInterval(() => {
+    surveillerDecodeursUtilisateurConnecte();
+  }, 15000);
+}
+
 export function majEtatDepuisInfo(info, adresse) {
+  synchroniserEtatDecodeur(adresse, info?.state);
+
   const zone = document.getElementById('etat-content');
   if (!zone) return;
   const lignes = zone.querySelectorAll('p');
@@ -299,7 +411,9 @@ export async function displayUserDecoders() {
       lastUpdateEl.textContent = `Dernière mise à jour : ${heures}:${minutes}:${secondes}`;
     }
     // Met aussi à jour le résumé utilisateur (nombre de décodeurs actifs/inactifs)
-    await displayUserSummary();
+    if (typeof window.displayUserSummary === 'function') {
+      await window.displayUserSummary();
+    }
   } catch (e) {
     console.error('Erreur lors du chargement des décodeurs:', e);
     container.innerHTML = '<p>Erreur lors du chargement de vos décodeurs.</p>';
@@ -453,6 +567,8 @@ export function msg(texte, type = 'info') {
 
 // Branche tous les listenenrs sur les boutons
 function initialiserUI() {
+  initialiserNotificationsEtatDecodeur();
+
   const btnAfficher = document.getElementById('btn-afficher-decodeur');
   const btnRefreshDecoders = document.getElementById('btn-refresh-decoders');
   const actions = document.querySelector('#etat #actions-content');
@@ -542,9 +658,28 @@ function chargerDecodeurDepuisSelectionUser() {
   boutonAfficherClique();
 }
 
+// Sur decodeur.html, charge automatiquement les infos quand on arrive depuis une carte dashboard
+async function initialiserDecodeurDepuisUrl() {
+  const currentPath = window.location.pathname.split('/').pop();
+  if (currentPath !== 'decodeur.html') return;
+
+  const params = new URLSearchParams(window.location.search);
+  const codePermanent = params.get('codePermanent')?.trim();
+  const address = params.get('address')?.trim();
+
+  if (!codePermanent || !address) return;
+
+  window.currentDecoderId = codePermanent;
+  window.currentDecoderAddress = address;
+
+  await boutonAfficherClique();
+}
+
 // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard
 document.addEventListener('DOMContentLoaded', async () => {
   initialiserUI();
+  demarrerSurveillanceGlobaleDecodeurs();
+  await initialiserDecodeurDepuisUrl();
 
   const currentPath = window.location.pathname.split('/').pop();
   if (currentPath === 'dashboard.html') {
