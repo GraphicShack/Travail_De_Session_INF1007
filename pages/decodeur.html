@@ -83,29 +83,5 @@
     </div>
 
     <script type="module" src="../js/controllers/decoderController.js"></script>
-    <script>
-      // Préremplissage et affichage automatique depuis les paramètres d'URL
-      document.addEventListener('DOMContentLoaded', async () => {
-        const params = new URLSearchParams(window.location.search);
-        const codePermanent = params.get('codePermanent');
-        const address = params.get('address');
-
-        // On stocke ces infos dans des variables globales pour que les boutons les utilisent
-        window.currentDecoderId = codePermanent;
-        window.currentDecoderAddress = address;
-
-        if (codePermanent && address && window.DecodeurAPI) {
-          try {
-            const info = await window.DecodeurAPI.getDecoderInfo(codePermanent, address);
-            // Réutilise la fonction existante pour mettre à jour l'affichage
-            if (typeof majEtatDepuisInfo === 'function') {
-              majEtatDepuisInfo(info, address);
-            }
-          } catch (e) {
-            console.error('Erreur lors du chargement du décodeur:', e);
-          }
-        }
-      });
-    </script>
   </body>
 </html>

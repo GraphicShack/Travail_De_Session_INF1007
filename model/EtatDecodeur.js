@@ -1,8 +1,6 @@
 export const EtatDecodeur = {
-
-    ALLUME: "ALLUME",
-    ETEINT: "ETEINT",
-    EN_REDEMARRAGE: "EN_REDEMARRAGE",
-    HORS_SERVICE: "HORS_SERVICE"
-
-}
+  ALLUME: 'Actif',
+  ETEINT: 'Inactif',
+  EN_REDEMARRAGE: 'En_Redemarrage',
+  HORS_SERVICE: 'Hors_service',
+};

@@ -56,6 +56,10 @@ export async function displayUserSummary() {
   }
 }
 
+if (typeof window !== 'undefined') {
+  window.displayUserSummary = displayUserSummary;
+}
+
 // Affichage du lien admin dans la nav si l'utilisateur est admin
 export function displayNav() {
   const user = getUser();
