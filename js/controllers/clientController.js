@@ -241,12 +241,12 @@ async function assignDecoderToClient(id, address) {
 }
 
 // Dissociation d'un décodeur d'un client
-export async function unassignDecoderFromClient(codePermanent, address) {
+export async function unassignDecoderFromClient(id, address) {
   try {
     const res = await fetch(`${API_URL}/users/unassign-decoder`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codePermanent, address }),
+      body: JSON.stringify({ id, address }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Erreur lors de la dissociation');

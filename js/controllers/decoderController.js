@@ -68,8 +68,8 @@ export async function displayClientDecoders() {
       container.querySelectorAll('.btn-unassign-decoder').forEach((button) => {
         button.addEventListener('click', async () => {
           const address = button.dataset.address;
-          if (!client.codePermanent || !address) {
-            console.error('Code permanent ou adresse de décodeur manquante.');
+          if (!client.id || !address) {
+            console.error('ID de client ou adresse de décodeur manquante.');
             return;
           }
           // Action du bouton de la dissociation
@@ -78,7 +78,7 @@ export async function displayClientDecoders() {
           );
           if (!confirmation) return;
           try {
-            await unassignDecoderFromClient(client.codePermanent, address);
+            await unassignDecoderFromClient(client.id, address);
             alert(`Décodeur ${address} dissocié avec succès.`);
             setTimeout(() => {
               window.location.reload();
