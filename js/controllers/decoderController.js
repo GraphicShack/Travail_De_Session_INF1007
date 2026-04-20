@@ -315,7 +315,10 @@ function lireCodeEtAdresseDepuisPage() {
   }
   const idInput = document.getElementById('input-code-permanent-top');
   const selectAdresse = document.getElementById('select-adresse-decodeur');
-  return { id: idInput?.value?.trim() || '', address: selectAdresse?.value || '' };
+  if (idInput?.value && /^[A-Z]{4}\d{8}$/.test(idInput.value.trim())) {
+    return { id: idInput?.value?.trim() || '', address: selectAdresse?.value || '' };
+  }
+  return { id: '', address: '' };
 }
 
 // Bouton "Afficher"
