@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const btnSignin = document.getElementById('btn-signin');
-  const messageSignin = document.getElementById('signin-message');
+  const messageSignin = document.getElementById('login-message');
 
   if (btnSignin) {
     btnSignin.addEventListener('click', async (e) => {

@@ -1,7 +1,8 @@
-import { getDecoderInfo, reinitDecoder, resetDecoder } from '../services/decoderService.js';
+import { getDecoderInfo, reinitDecoder, resetDecoder, shutdownDecoder } from '../services/decoderService.js';
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
 import { unassignDecoderFromClient } from './clientController.js';
+import { displayUserSummary } from './dashboardController.js';
 /*import { getUser } from './AuthController.js';
 import { getUser } from '/authController.js';
 import { getUser } from '/AuthController.js';
@@ -67,8 +68,8 @@ export async function displayClientDecoders() {
       container.querySelectorAll('.btn-unassign-decoder').forEach((button) => {
         button.addEventListener('click', async () => {
           const address = button.dataset.address;
-          if (!client.codePermanent || !address) {
-            console.error('Code permanent ou adresse de décodeur manquante.');
+          if (!client.id || !address) {
+            console.error('ID de client ou adresse de décodeur manquante.');
             return;
           }
           // Action du bouton de la dissociation
@@ -77,9 +78,11 @@ export async function displayClientDecoders() {
           );
           if (!confirmation) return;
           try {
-            await unassignDecoderFromClient(client.codePermanent, address);
+            await unassignDecoderFromClient(client.id, address);
             alert(`Décodeur ${address} dissocié avec succès.`);
-            setTimeout(() => { window.location.reload(); }, 1000);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } catch (error) {
             alert('Erreur: ' + error.message);
           }
@@ -312,7 +315,10 @@ function lireCodeEtAdresseDepuisPage() {
   }
   const idInput = document.getElementById('input-code-permanent-top');
   const selectAdresse = document.getElementById('select-adresse-decodeur');
-  return { id: idInput?.value?.trim() || '', address: selectAdresse?.value || '' };
+  if (idInput?.value && /^[A-Z]{4}\d{8}$/.test(idInput.value.trim())) {
+    return { id: idInput?.value?.trim() || '', address: selectAdresse?.value || '' };
+  }
+  return { id: '', address: '' };
 }
 
 // Bouton "Afficher"
@@ -542,6 +548,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const currentPath = window.location.pathname.split('/').pop();
   if (currentPath === 'dashboard.html') {
+    await displayUserDecoders();
     setInterval(() => {
       displayUserDecoders();
     }, 30000); // 30 000 ms = 30 secondes
