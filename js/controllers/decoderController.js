@@ -2,6 +2,7 @@ import { getDecoderInfo, reinitDecoder, resetDecoder } from '../services/decoder
 import { API_URL } from '../utils/config.js';
 import { getUser } from './authController.js';
 import { unassignDecoderFromClient } from './clientController.js';
+import { displayUserSummary } from './dashboardController.js';
 /*import { getUser } from './AuthController.js';
 import { getUser } from '/authController.js';
 import { getUser } from '/AuthController.js';
@@ -79,7 +80,9 @@ export async function displayClientDecoders() {
           try {
             await unassignDecoderFromClient(client.codePermanent, address);
             alert(`Décodeur ${address} dissocié avec succès.`);
-            setTimeout(() => { window.location.reload(); }, 1000);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } catch (error) {
             alert('Erreur: ' + error.message);
           }
@@ -542,6 +545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const currentPath = window.location.pathname.split('/').pop();
   if (currentPath === 'dashboard.html') {
+    await displayUserDecoders();
     setInterval(() => {
       displayUserDecoders();
     }, 30000); // 30 000 ms = 30 secondes
