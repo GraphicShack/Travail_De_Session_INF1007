@@ -626,10 +626,10 @@ async function initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDec
       if (!idx) return;
       const user = window.__adminUsers?.[Number(idx)];
       const decoders = user?.decodeurs || [];
-      decoders.forEach((addr) => {
+      decoders.forEach((decoder) => {
         const opt = document.createElement('option');
-        opt.value = addr;
-        opt.textContent = addr;
+        opt.value = decoder.adresse;
+        opt.textContent = decoder.adresse;
         selectUserDecoder.appendChild(opt);
       });
     });
