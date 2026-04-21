@@ -404,12 +404,14 @@ fieldset legend {
 }
 
 /* Ligne client */
-.client-line button, .edit-client-form button {
+.client-line button,
+.edit-client-form button {
   margin-top: 5px;
   margin-right: 10px;
 }
 
-.client-line button:last-child, .edit-client-form button:last-child {
+.client-line button:last-child,
+.edit-client-form button:last-child {
   background-color: red;
   margin-right: 0;
 }
@@ -477,4 +479,10 @@ p.client-decoder-item {
 
 #client-page-message {
   margin-top: 10px;
+}
+
+button[id*='btn-cancel' i],
+button[class*='btn-cancel' i] {
+  background-color: red;
+  color: white;
 }

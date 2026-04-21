@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const btnOpenEditClient = document.getElementById('btnClientEditForm');
-    const btnCancelEditClient = document.getElementById('btnCancelEditClient');
+    const btnCancelEditClient = document.getElementById('btn-cancel-edit-client');
     if (btnOpenEditClient) {
       // Ouvre le form pour modifier les infos du client
       btnOpenEditClient.addEventListener('click', () => {

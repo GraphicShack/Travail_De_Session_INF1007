@@ -327,9 +327,9 @@ app.post('/api/users/unassign-decoder', (req, res) => {
 
 // Assigner chaine
 app.post('/api/decoder/assign-channel', (req, res) => {
-  const { codePermanent, address, chaine } = req.body;
+  const { id, address, chaine } = req.body;
 
-  if (!codePermanent || !address || !chaine) {
+  if (!id || !address || !chaine) {
     return res.status(400).json({
       message: 'Champs manquants',
     });
@@ -337,24 +337,24 @@ app.post('/api/decoder/assign-channel', (req, res) => {
 
   try {
     let users = getUsers();
-    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    const userIndex = users.findIndex((u) => u.id === id);
 
     if (userIndex === -1) {
       return res.status(404).json({ message: 'Client introuvable' });
     }
 
-    const decodeur = users[userIndex].decodeurs.find((d) => d.address === address);
+    const decodeur = users[userIndex].decodeurs.find((d) => d.adresse === address);
 
     if (!decodeur) {
-      return res.status(403).json({ message: "Ce decodeur n'appartient pas à ce client" });
+      return res.status(403).json({ message: "Ce décodeur n'appartient pas à ce client" });
     }
 
-    if (!decodeur.Chaines.includes(chaine)) {
-      decodeur.Chaines.push(chaine);
+    if (!decodeur.chaines.includes(chaine)) {
+      decodeur.chaines.push(chaine);
       fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
-      return res.status(200).json({ message: 'Chaîne ajoutée avec succès' });
+      return res.status(200).json({ message: 'Chaîne ajoutée avec succès.' });
     } else {
-      return res.status(400).json({ message: 'Cette chaîne est déjà sur ce décodeur' });
+      return res.status(400).json({ message: 'Cette chaîne est déjà sur ce décodeur.' });
     }
   } catch (error) {
     return res.status(500).json({ message: 'Erreur serveur' });
@@ -362,11 +362,11 @@ app.post('/api/decoder/assign-channel', (req, res) => {
 });
 
 app.post('/api/decoder/remove-channel', (req, res) => {
-  const { codePermanent, address, chaine } = req.body;
+  const { id, address, chaine } = req.body;
 
   try {
     let users = getUsers();
-    const userIndex = users.findIndex((u) => u.codePermanent === codePermanent);
+    const userIndex = users.findIndex((u) => u.id === id);
 
     if (userIndex === -1) return res.status(404).json({ message: 'Client introuvable' });
 
@@ -375,9 +375,9 @@ app.post('/api/decoder/remove-channel', (req, res) => {
     if (!decodeur)
       return res.status(403).json({ message: "Ce décodeur n'appartient pas à ce client" });
 
-    const indexChaine = decodeur.Chaines.indexOf(chaine);
+    const indexChaine = decodeur.chaines.indexOf(chaine);
     if (indexChaine !== -1) {
-      decodeur.Chaines.splice(indexChaine, 1);
+      decodeur.chaines.splice(indexChaine, 1);
       fs.writeFileSync(USERS_PATH, JSON.stringify(users, null, 2));
       return res.status(200).json({ message: 'Chaîne retirée avec succès' });
     } else {

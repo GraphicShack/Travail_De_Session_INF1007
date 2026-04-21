@@ -68,12 +68,12 @@ export async function getAllDecodersInfo(id) {
   return results;
 }
 
-export async function assignChannelToDecoder(codePermanent, address, chaine) {
+export async function assignChannelToDecoder(id, address, chaine) {
   try {
     const response = await fetch(`${API_URL}/decoder/assign-channel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codePermanent, address, chaine }),
+      body: JSON.stringify({ id, address, chaine }),
     });
 
     const data = await response.json();
@@ -87,12 +87,12 @@ export async function assignChannelToDecoder(codePermanent, address, chaine) {
   }
 }
 
-export async function removeChannelFromDecoder(codePermanent, address, chaine) {
+export async function removeChannelFromDecoder(id, address, chaine) {
   try {
     const response = await fetch(`${API_URL}/decoder/remove-channel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codePermanent, address, chaine }),
+      body: JSON.stringify({ id, address, chaine }),
     });
 
     const data = await response.json();

@@ -57,14 +57,25 @@
             <h2>Chaînes</h2>
             <fieldset>
               <legend>Liste des chaines</legend>
-              <div id="chaines-content">
-                <ul></ul>
-              </div>
+              <div id="chaines-content"></div>
+              <br />
               <fieldset>
                 <legend>Actions rapides</legend>
                 <div id="chaines-actions-content">
-                  <button type="button">Ajouter une Chaine</button>
-                  <button type="button">Supprimer une Chaine</button>
+                  <button type="button" id="btn-add-channel">Ajouter une Chaine</button>
+                  <button type="button" id="btn-delete-channel">Supprimer une Chaine</button>
+                  <div id="add-channel-section" style="display: none">
+                    <br />
+                    <input id="channel-name" type="text" />
+                    <button id="btn-save-channel">Sauvegarder</button>
+                    <button id="test-cancel" class="btn-cancel-channel">Annuler</button>
+                  </div>
+                  <div id="delete-channel-section" style="display: none">
+                    <br />
+                    <select id="select-channel-delete"></select>
+                    <button id="btn-remove-channel">Supprimer</button>
+                    <button class="btn-cancel-channel">Annuler</button>
+                  </div>
                 </div>
               </fieldset>
             </fieldset>
@@ -83,5 +94,6 @@
     </div>
 
     <script type="module" src="../js/controllers/decoderController.js"></script>
+    <script type="module" src="../js/controllers/dashboardController.js"></script>
   </body>
 </html>

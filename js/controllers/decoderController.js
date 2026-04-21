@@ -155,10 +155,10 @@ export async function displayClientDecoders() {
             <div class="client-decoder-list">
               ${decoders
                 .map(
-                  (decodeurs, index) => `
+                  (decoder, index) => `
                     <p class="client-decoder-item">
-                      <span>Décodeur ${index + 1} — ${decodeurs.adresse}</span>
-                      <button type="button" class="btn-unassign-decoder" data-address="${decodeurs.adresse}">Dissocier le décodeur</button>
+                      <span>Décodeur ${index + 1} — ${decoder.adresse}</span>
+                      <button type="button" class="btn-unassign-decoder" data-address="${decoder.adr}">Dissocier le décodeur</button>
                       <hr />
                     </p>
                   `
@@ -198,7 +198,7 @@ export async function displayClientDecoders() {
               window.location.reload();
             }, 1000);
           } catch (error) {
-            alert('Erreur: ' + error.message + '.');
+            alert('Erreur: ' + error.message);
           }
         });
       });
@@ -623,8 +623,8 @@ async function initialiserSelectionParUtilisateur(selectUserAdmin, selectUserDec
       const decoders = user?.decodeurs || [];
       decoders.forEach((addr) => {
         const opt = document.createElement('option');
-        opt.value = addr.adresse;
-        opt.textContent = addr.adresse;
+        opt.value = addr;
+        opt.textContent = addr;
         selectUserDecoder.appendChild(opt);
       });
     });
@@ -676,12 +676,11 @@ async function initialiserDecodeurDepuisUrl() {
 
   await boutonAfficherClique();
 }
-
+/*
 // Ajouter une chaine
 export async function handleAssignChannel(event) {
   event.preventDefault();
 
-  const button = event.currentTarget;
   const address = button.getAttribute('data-ip');
 
   const inputChaine = button.previousElementSibling;
@@ -702,8 +701,8 @@ export async function handleAssignChannel(event) {
   } catch (error) {
     alert(error.message);
   }
-}
-
+}*/
+/*
 export async function handleRemoveChannel(event) {
   event.preventDefault();
 
@@ -722,6 +721,73 @@ export async function handleRemoveChannel(event) {
       alert(error.message);
     }
   }
+}*/
+
+async function fillChannelList() {
+  const select = document.getElementById('select-channel-delete');
+  if (!select) return;
+
+  select.innerHTML = '<option value = "">Chargement des chaines...</option>';
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const adresse = params.get('address').trim();
+    const id = getUser().id;
+
+    const res = await fetch(`${API_URL}/client/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const user = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur lors de la récupération du client.');
+    const decodeur = user.decodeurs.find((d) => d.adresse === adresse);
+
+    select.innerHTML = '<option value="">Sélectionnez une chaîne</option>';
+    for (let i = 0; i < decodeur?.chaines?.length; i++) {
+      const option = document.createElement('option');
+      option.value = decodeur.chaines[i];
+      option.textContent = decodeur.chaines[i];
+      select.appendChild(option);
+    }
+  } catch (e) {
+    console.error('Erreur lors du remplissage de la liste des chaines.');
+    select.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+async function displayChannelList() {
+  const box = document.getElementById('chaines-content');
+  if (!box) return;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const adresse = params.get('address').trim();
+    const id = getUser().id;
+
+    const res = await fetch(`${API_URL}/client/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const user = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur lors de la récupération du client.');
+    const decodeur = user.decodeurs.find((d) => d.adresse === adresse);
+
+    for (let i = 0; i < decodeur?.chaines?.length; i++) {
+      const item = document.createElement('span');
+      item.className = 'liste-channel';
+      item.textContent = decodeur.chaines[i];
+      box.appendChild(item);
+      box.appendChild(document.createElement('br'));
+    }
+
+    if (decodeur?.chaines?.length === 0) {
+      const item = document.createElement('span');
+      item.textContent = 'Aucune chaines à afficher.';
+      box.appendChild(item);
+    }
+  } catch (error) {
+    console.error("Erreur lors de l'affichage de la liste des chaines.");
+  }
 }
 
 // Rafraîchissement automatique de l'état des décodeurs toutes les 30 secondes sur le dashboard
@@ -736,5 +802,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(() => {
       displayUserDecoders();
     }, 30000); // 30 000 ms = 30 secondes
+  }
+
+  if (currentPath === 'decodeur.html') {
+    const btnAddChannel = document.getElementById('btn-add-channel');
+    const saveChannelDiv = document.getElementById('add-channel-section');
+    const deleteChannelDiv = document.getElementById('delete-channel-section');
+    const btnRemoveChannel = document.getElementById('btn-delete-channel');
+    const btnCancelChannelOperation = document.getElementsByClassName('btn-cancel-channel');
+    const btnSaveChannel = document.getElementById('btn-save-channel');
+    const btnDeleteChannel = document.getElementById('btn-remove-channel');
+    const select = document.getElementById('select-channel-delete');
+    const user = getUser();
+    const params = new URLSearchParams(window.location.search);
+    const adresse = params.get('address').trim();
+    displayChannelList();
+
+    if (btnAddChannel) {
+      btnAddChannel.addEventListener('click', () => {
+        if (deleteChannelDiv.style.display === 'block') deleteChannelDiv.style.display = 'none';
+        if (saveChannelDiv) saveChannelDiv.style.display = 'block';
+      });
+    }
+    if (btnRemoveChannel) {
+      btnRemoveChannel.addEventListener('click', async () => {
+        if (saveChannelDiv.style.display === 'block') saveChannelDiv.style.display = 'none';
+        if (deleteChannelDiv) deleteChannelDiv.style.display = 'block';
+        await fillChannelList();
+      });
+    }
+    if (btnCancelChannelOperation.length !== 0) {
+      for (let i = 0; i < btnCancelChannelOperation.length; i++) {
+        btnCancelChannelOperation[i].addEventListener('click', () => {
+          saveChannelDiv.style.display = 'none';
+          deleteChannelDiv.style.display = 'none';
+        });
+      }
+    }
+    if (btnSaveChannel) {
+      btnSaveChannel.addEventListener('click', async () => {
+        try {
+          const channelInput = document.getElementById('channel-name');
+          const channelName = channelInput.value.trim();
+          if (!channelName) {
+            alert('Veuillez entrer un nom de chaîne.');
+            return;
+          }
+          await assignChannelToDecoder(user.id, adresse, channelName);
+          alert('Chaîne ajoutée avec succès.');
+          window.location.reload();
+        } catch (error) {
+          alert(error.message || "Erreur lors de l'assignation de la chaîne.");
+        }
+      });
+    }
+    if (btnDeleteChannel) {
+      btnDeleteChannel.addEventListener('click', async () => {
+        const channelName = select.value.trim();
+        await removeChannelFromDecoder(user.id, adresse, channelName);
+        alert('Chaîne retirée avec succès.');
+        window.location.reload();
+      });
+    }
   }
 });
