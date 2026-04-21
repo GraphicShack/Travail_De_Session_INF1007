@@ -470,6 +470,9 @@ async function boutonResetClique() {
     const res = await resetDecoder(id, address);
     msg(res, 'success');
     msg('Attente que le décodeur redevienne actif...', 'debug');
+    const info = await getDecoderInfo(id, address);
+    info.state = 'resetting';
+    majEtatDepuisInfo(info, address);
     const intervalMs = 5000,
       timeoutMs = 60000,
       debut = Date.now();
@@ -480,7 +483,7 @@ async function boutonResetClique() {
       }
       await new Promise((r) => setTimeout(r, intervalMs));
       try {
-        // on vérifie si le décodeur est rendu actif ou nope
+        // on vérifie si le décodeur est rendu actif ou non
         const info = await getDecoderInfo(id, address);
         if (info.state === 'active') {
           msg('Le décodeur est redevenu actif !', 'success');
