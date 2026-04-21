@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "nom": "Admin123",
+    "nom": "Alexis",
     "email": "admin@gmail.com",
     "motDePasse": "-904517469",
     "codePermanent": "OSSA81360300",
@@ -24,11 +24,17 @@
       },
       {
         "adresse": "127.0.10.2",
-        "chaines": []
+        "chaines": [
+          "Historia",
+          "Discovery Channel"
+        ]
       },
       {
         "adresse": "127.0.10.3",
-        "chaines": []
+        "chaines": [
+          "Prise 2",
+          "Cinepop"
+        ]
       }
     ]
   },
@@ -42,15 +48,27 @@
     "decodeurs": [
       {
         "adresse": "127.0.10.5",
-        "chaines": []
+        "chaines": [
+          "TQS",
+          "TVA",
+          "Télé-Métropole"
+        ]
       },
       {
         "adresse": "127.0.10.6",
-        "chaines": []
+        "chaines": [
+          "Noovo",
+          "Addick",
+          "Z"
+        ]
       },
       {
         "adresse": "127.0.10.7",
-        "chaines": []
+        "chaines": [
+          "Sexxxe",
+          "Bleue nuit",
+          "Prout Prout"
+        ]
       }
     ]
   },
@@ -64,15 +82,26 @@
     "decodeurs": [
       {
         "adresse": "127.0.10.9",
-        "chaines": []
+        "chaines": [
+          "Télé-Québec",
+          "Canal Vie"
+        ]
       },
       {
         "adresse": "127.0.10.10",
-        "chaines": []
+        "chaines": [
+          "Canal D",
+          "Télétoon",
+          "Vrak Tv"
+        ]
       },
       {
         "adresse": "127.0.10.11",
-        "chaines": []
+        "chaines": [
+          "Cinépop",
+          "Super Écran",
+          "Prise 2"
+        ]
       }
     ]
   }
