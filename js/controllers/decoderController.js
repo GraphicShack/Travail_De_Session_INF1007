@@ -95,12 +95,12 @@ async function surveillerDecodeursUtilisateurConnecte() {
     if (!codePermanent || !decoders.length) return;
 
     await Promise.all(
-      decoders.map(async (address) => {
+      decoders.map(async (decoder) => {
         try {
-          const info = await getDecoderInfo(codePermanent, address);
-          synchroniserEtatDecodeur(address, info?.state);
+          const info = await getDecoderInfo(codePermanent, decoder.adresse);
+          synchroniserEtatDecodeur(decoder.adresse, info?.state);
         } catch (e) {
-          msg(`Surveillance décodeur ${address} impossible: ${e.message}`, 'debug');
+          msg(`Surveillance décodeur ${decoder.adresse} impossible: ${e.message}`, 'debug');
         }
       })
     );

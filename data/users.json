@@ -9,10 +9,10 @@
   },
   {
     "id": 2,
-    "nom": "Alexis",
+    "nom": "Alec",
     "email": "test2@gmail.com",
     "motDePasse": "-1083238412",
-    "codePermanent": "OSSA81360300",
+    "codePermanent": "PAQA78050208",
     "role": "user",
     "decodeurs": [
       {
@@ -28,6 +28,50 @@
       },
       {
         "adresse": "127.0.10.3",
+        "chaines": []
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "nom": "Angie",
+    "email": "martel.angie@gmail.com",
+    "motDePasse": "-1867378627",
+    "codePermanent": "MARA22559304",
+    "role": "user",
+    "decodeurs": [
+      {
+        "adresse": "127.0.10.5",
+        "chaines": []
+      },
+      {
+        "adresse": "127.0.10.6",
+        "chaines": []
+      },
+      {
+        "adresse": "127.0.10.7",
+        "chaines": []
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "nom": "Pablo Escrobar",
+    "email": "pablo.escrobar@mail.com",
+    "motDePasse": "-1083238412",
+    "codePermanent": "LEFF87100303",
+    "role": "user",
+    "decodeurs": [
+      {
+        "adresse": "127.0.10.9",
+        "chaines": []
+      },
+      {
+        "adresse": "127.0.10.10",
+        "chaines": []
+      },
+      {
+        "adresse": "127.0.10.11",
         "chaines": []
       }
     ]
