@@ -1,4 +1,3 @@
-//import { validateEmail } from '../services/userService.js';
 import { API_URL } from '../utils/config.js';
 
 // Récupération de la liste des utilisateurs (pour la page admin)
@@ -193,22 +192,3 @@ export function validateEmailAlreadyExists(email) {
 export function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-/*
-export async function signin(email, password) {
-  const pwdHache = hachageMotDePasse(password);
-
-  const res = await fetch(`${API_URL}/signin`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password: pwdHache }),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.message || 'Erreur lors de la connexion');
-  }
-
-  return data.user;
-}
-*/
