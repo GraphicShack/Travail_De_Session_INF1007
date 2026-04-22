@@ -160,7 +160,7 @@ export async function displayClientDecoders() {
                   (decoder, index) => `
                     <p class="client-decoder-item">
                       <span>Décodeur ${index + 1} — ${decoder.adresse}</span>
-                      <button type="button" class="btn-unassign-decoder" data-address="${decoder.adr}">Dissocier le décodeur</button>
+                      <button type="button" class="btn-unassign-decoder" data-address="${decoder.adresse}">Dissocier le décodeur</button>
                       <hr />
                     </p>
                   `
